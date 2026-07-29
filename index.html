@@ -798,4 +798,387 @@
         canvas.addEventListener('mousemove', onMouse);
 
         function update() {
-            ball.x += ball.vx
+            ball.x += ball.vx; ball.y += ball.vy;
+
+            // Стены
+            if (ball.x < 10 || ball.x > W-10) ball.vx *= -1;
+            if (ball.y < 10) ball.vy *= -1;
+            if (ball.y > H) { lives--; ball.x=W/2; ball.y=H-50; ball.vx=3; ball.vy=-4; if (lives<=0) gameRunning=false; }
+
+            // Ракетка
+            if (ball.y + ball.r > paddle.y && ball.y - ball.r < paddle.y + paddle.h &&
+                ball.x > paddle.x && ball.x < paddle.x + paddle.w) {
+                ball.vy = -Math.abs(ball.vy);
+                ball.vx += (ball.x - (paddle.x+paddle.w/2)) * 0.1;
+                if (Math.abs(ball.vx) > 6) ball.vx = Math.sign(ball.vx)*6;
+            }
+
+            // Кирпичи
+            bricks.forEach(b => {
+                if (!b.alive) return;
+                if (ball.x > b.x && ball.x < b.x+b.w && ball.y > b.y && ball.y < b.y+b.h) {
+                    b.alive = false;
+                    score += 10;
+                    ball.vy *= -1;
+                }
+            });
+        }
+
+        function draw() {
+            ctx.fillStyle = '#11161f';
+            ctx.fillRect(0, 0, W, H);
+
+            ctx.fillStyle = '#f44336';
+            bricks.forEach(b => { if (b.alive) ctx.fillRect(b.x, b.y, b.w, b.h); });
+
+            ctx.fillStyle = '#4fc3f7';
+            ctx.fillRect(paddle.x, paddle.y, paddle.w, paddle.h);
+
+            ctx.fillStyle = '#ffeb3b';
+            ctx.beginPath(); ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI*2); ctx.fill();
+
+            ctx.fillStyle = '#f7d44a';
+            ctx.font = '18px monospace';
+            ctx.fillText('🏆 ' + score, 10, 30);
+            ctx.fillText('❤️ '.repeat(lives), W-100, 30);
+        }
+
+        function loop() {
+            if (!gameRunning) return;
+            update();
+            draw();
+            animId = requestAnimationFrame(loop);
+        }
+        function cleanup() { canvas.removeEventListener('mousemove', onMouse); }
+        loop();
+        return { cleanup };
+    }
+
+    // ============================================================
+    //  ИГРА 6: POLE POSITION (гонка)
+    // ============================================================
+    function gamePole() {
+        const W = 700, H = 440;
+        let player = { x: W/2, y: H-60, w: 30, h: 40 };
+        let obstacles = [];
+        let score = 0;
+        let speed = 3;
+        let keys = {};
+
+        function onKey(e) { keys[e.key] = true; }
+        function onKeyUp(e) { keys[e.key] = false; }
+        window.addEventListener('keydown', onKey);
+        window.addEventListener('keyup', onKeyUp);
+
+        function update() {
+            if (keys['ArrowLeft']) player.x -= 5;
+            if (keys['ArrowRight']) player.x += 5;
+            player.x = Math.max(20, Math.min(W-20, player.x));
+
+            if (Math.random() < 0.04) {
+                obstacles.push({ x: 50+Math.random()*(W-100), y: 0, w: 30+Math.random()*30, h: 20 });
+            }
+            obstacles.forEach(o => o.y += speed);
+            obstacles = obstacles.filter(o => o.y < H);
+
+            obstacles.forEach(o => {
+                if (player.x > o.x-20 && player.x < o.x+o.w+20 && player.y > o.y-20 && player.y < o.y+o.h+20) {
+                    score = Math.max(0, score-50);
+                }
+            });
+
+            score += 1;
+        }
+
+        function draw() {
+            ctx.fillStyle = '#1a232f';
+            ctx.fillRect(0, 0, W, H);
+            // Дорога
+            ctx.fillStyle = '#2c3e50';
+            for (let i = 0; i < H; i+=30) {
+                ctx.fillRect(W/2-4, (i+score)%H, 8, 15);
+            }
+
+            ctx.fillStyle = '#e53935';
+            obstacles.forEach(o => ctx.fillRect(o.x, o.y, o.w, o.h));
+
+            ctx.fillStyle = '#4fc3f7';
+            ctx.fillRect(player.x-15, player.y-20, 30, 40);
+
+            ctx.fillStyle = '#f7d44a';
+            ctx.font = '18px monospace';
+            ctx.fillText('🏁 ' + Math.floor(score/10), 10, 30);
+        }
+
+        function loop() {
+            if (!gameRunning) return;
+            update();
+            draw();
+            animId = requestAnimationFrame(loop);
+        }
+        function cleanup() {
+            window.removeEventListener('keydown', onKey);
+            window.removeEventListener('keyup', onKeyUp);
+        }
+        loop();
+        return { cleanup };
+    }
+
+    // ============================================================
+    //  ИГРА 7: SNAKE WARS
+    // ============================================================
+    function gameSnake() {
+        const W = 700, H = 440;
+        const CELL = 18;
+        let snake = [{x: 10, y: 10}];
+        let food = {x: 20, y: 10};
+        let dir = {x: 1, y: 0};
+        let nextDir = {x: 1, y: 0};
+        let score = 0;
+        let gameOver = false;
+        let keys = {};
+
+        function onKey(e) {
+            keys[e.key] = true;
+            if (e.key === 'ArrowUp' && dir.y === 0) nextDir = {x:0, y:-1};
+            if (e.key === 'ArrowDown' && dir.y === 0) nextDir = {x:0, y:1};
+            if (e.key === 'ArrowLeft' && dir.x === 0) nextDir = {x:-1, y:0};
+            if (e.key === 'ArrowRight' && dir.x === 0) nextDir = {x:1, y:0};
+        }
+        window.addEventListener('keydown', onKey);
+
+        function spawnFood() {
+            food = {x: Math.floor(Math.random()*(W/CELL)), y: Math.floor(Math.random()*(H/CELL))};
+        }
+        spawnFood();
+
+        function update() {
+            if (gameOver) return;
+            dir = {...nextDir};
+            let head = {...snake[0]};
+            head.x += dir.x; head.y += dir.y;
+
+            if (head.x < 0 || head.x >= W/CELL || head.y < 0 || head.y >= H/CELL) { gameOver = true; return; }
+
+            for (let s of snake) {
+                if (s.x === head.x && s.y === head.y) { gameOver = true; return; }
+            }
+
+            snake.unshift(head);
+            if (head.x === food.x && head.y === food.y) {
+                score += 10;
+                spawnFood();
+            } else {
+                snake.pop();
+            }
+        }
+
+        function draw() {
+            ctx.fillStyle = '#0a0d14';
+            ctx.fillRect(0, 0, W, H);
+
+            ctx.fillStyle = '#4caf50';
+            snake.forEach(s => ctx.fillRect(s.x*CELL+1, s.y*CELL+1, CELL-2, CELL-2));
+
+            ctx.fillStyle = '#ff5252';
+            ctx.fillRect(food.x*CELL+1, food.y*CELL+1, CELL-2, CELL-2);
+
+            ctx.fillStyle = '#f7d44a';
+            ctx.font = '18px monospace';
+            ctx.fillText('🐍 ' + score, 10, 30);
+            if (gameOver) {
+                ctx.fillStyle = '#ff1744';
+                ctx.font = '32px monospace';
+                ctx.fillText('GAME OVER', W/2-100, H/2);
+            }
+        }
+
+        function loop() {
+            if (!gameRunning) return;
+            update();
+            draw();
+            animId = requestAnimationFrame(loop);
+        }
+        function cleanup() { window.removeEventListener('keydown', onKey); }
+        loop();
+        return { cleanup };
+    }
+
+    // ============================================================
+    //  ИГРА 8: DRAGON QUEST (текстовая RPG)
+    // ============================================================
+    function gameDragon() {
+        const W = 700, H = 440;
+        let state = 'start';
+        let hp = 20;
+        let maxHp = 20;
+        let gold = 0;
+        let monsterHp = 0;
+        let log = 'Добро пожаловать в Dragon Quest!';
+
+        function updateLog(msg) { log = msg; }
+
+        function fight() {
+            monsterHp = 10 + Math.floor(Math.random()*15);
+            state = 'fight';
+            updateLog('⚔️ Монстр! HP: ' + monsterHp);
+        }
+
+        function attack() {
+            if (state !== 'fight') return;
+            let dmg = 3 + Math.floor(Math.random()*6);
+            monsterHp -= dmg;
+            updateLog('💥 Урон ' + dmg + ' (осталось ' + monsterHp + ')');
+            if (monsterHp <= 0) {
+                gold += 10 + Math.floor(Math.random()*10);
+                updateLog('🏆 Победа! +' + gold + ' золота');
+                state = 'start';
+                return;
+            }
+            let enemyDmg = 2 + Math.floor(Math.random()*4);
+            hp -= enemyDmg;
+            if (hp <= 0) { hp = 0; updateLog('💀 Ты погиб... Начни заново'); state = 'dead'; }
+            else { updateLog('❤️ ' + hp + '/' + maxHp + ' HP'); }
+        }
+
+        function heal() {
+            if (gold >= 10) {
+                gold -= 10;
+                hp = Math.min(maxHp, hp+10);
+                updateLog('💚 Восстановлено! HP: ' + hp);
+            } else {
+                updateLog('❌ Не хватает золота (нужно 10)');
+            }
+        }
+
+        function reset() {
+            hp = maxHp; gold = 0; state = 'start';
+            updateLog('Новое приключение!');
+        }
+
+        // Рисуем кнопки прямо на канвасе
+        function draw() {
+            ctx.fillStyle = '#1a1f2a';
+            ctx.fillRect(0, 0, W, H);
+
+            ctx.fillStyle = '#d0def0';
+            ctx.font = '20px monospace';
+            ctx.fillText('🧙 DRAGON QUEST', 20, 40);
+
+            ctx.fillStyle = '#b8cbeb';
+            ctx.font = '16px monospace';
+            ctx.fillText('HP: ' + hp + '/' + maxHp + '  |  🪙 ' + gold, 20, 80);
+            ctx.fillText('📜 ' + log, 20, 120);
+
+            // Кнопки (рисуем)
+            const btns = [
+                { label: '⚔️ Сражаться', x: 50, y: 200, action: fight },
+                { label: '💚 Лечить (10🪙)', x: 220, y: 200, action: heal },
+                { label: '🔄 Перезапуск', x: 430, y: 200, action: reset },
+            ];
+            btns.forEach(b => {
+                ctx.fillStyle = '#2c3e50';
+                ctx.fillRect(b.x, b.y, 160, 44);
+                ctx.fillStyle = '#f7d44a';
+                ctx.font = '18px monospace';
+                ctx.fillText(b.label, b.x+10, b.y+30);
+                // Сохраняем области для кликов
+                b.rect = {x: b.x, y: b.y, w: 160, h: 44};
+            });
+            // Сохраняем кнопки в глобал
+            window._rpgBtns = btns;
+        }
+
+        function loop() {
+            if (!gameRunning) return;
+            draw();
+            animId = requestAnimationFrame(loop);
+        }
+
+        // Обработка кликов по кнопкам
+        function onCanvasClick(e) {
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            const mx = (e.clientX - rect.left) * scaleX;
+            const my = (e.clientY - rect.top) * scaleY;
+
+            if (window._rpgBtns) {
+                for (let b of window._rpgBtns) {
+                    if (mx > b.rect.x && mx < b.rect.x + b.rect.w &&
+                        my > b.rect.y && my < b.rect.y + b.rect.h) {
+                        b.action();
+                        return;
+                    }
+                }
+            }
+        }
+        canvas.addEventListener('click', onCanvasClick);
+
+        function cleanup() {
+            canvas.removeEventListener('click', onCanvasClick);
+            window._rpgBtns = null;
+        }
+        loop();
+        return { cleanup };
+    }
+
+    // ============================================================
+    //  ЗАПУСК ИГР ПО КНОПКЕ
+    // ============================================================
+    const games = {
+        invaders: gameInvaders,
+        pacman: gamePacman,
+        dkong: gameDkong,
+        asteroids: gameAsteroids,
+        breakout: gameBreakout,
+        pole: gamePole,
+        snake: gameSnake,
+        dragon: gameDragon,
+    };
+
+    function startGame(name) {
+        // Останавливаем текущую
+        if (currentGame && currentGame.cleanup) currentGame.cleanup();
+        if (animId) cancelAnimationFrame(animId);
+        gameRunning = false;
+
+        // Показываем контейнер
+        container.classList.add('active');
+        grid.style.display = 'none';
+
+        // Запускаем новую
+        gameRunning = true;
+        const gameFn = games[name];
+        if (gameFn) {
+            currentGame = gameFn();
+            statusEl.textContent = '🎮 ' + name.toUpperCase() + ' запущена';
+        } else {
+            statusEl.textContent = '❌ Игра не найдена';
+        }
+    }
+
+    // Кнопки PLAY
+    document.querySelectorAll('.play-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const card = e.target.closest('.game-card');
+            const gameName = card.dataset.game;
+            startGame(gameName);
+        });
+    });
+
+    // Закрыть игру
+    closeBtn.addEventListener('click', () => {
+        gameRunning = false;
+        if (currentGame && currentGame.cleanup) currentGame.cleanup();
+        if (animId) cancelAnimationFrame(animId);
+        container.classList.remove('active');
+        grid.style.display = 'grid';
+        statusEl.textContent = '🎮 Игра закрыта';
+    });
+
+    // Начальный статус
+    statusEl.textContent = '🎮 Выберите игру';
+</script>
+</body>
+</html>
