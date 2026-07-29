@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>🍀 Поймай монетку</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      user-select: none;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: linear-gradient(145deg, #1e3c4f, #0e2a3a);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+      padding: 16px;
+    }
+
+    .game-wrapper {
+      background: #2d4d5e;
+      padding: 24px 24px 30px;
+      border-radius: 60px 60px 40px 40px;
+      box-shadow: 0 20px 30px rgba(0, 0, 0, 0.6), inset 0 2px 4px rgba(255, 255, 255, 0.1);
+      max-width: 650px;
+      width: 100%;
+    }
+
+    .game-panel {
+      background: #1f3b48;
+      border-radius: 40px;
+      padding: 20px 20px 24px;
+      box-shadow: inset 0 6px 10px rgba(0, 0, 0, 0.5), 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .stats {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #0f2937;
+      padding: 12px 20px;
+      border-radius: 50px;
+      margin-bottom: 20px;
+      color: #f2e9c7;
+      font-weight: 600;
+      font-size: 1.3rem;
+      box-shadow: inset 0 3px 6px rgba(0,0,0,0.6);
+    }
+
+    .score-box {
+      background: #2d4f5e;
+      padding: 6px 18px;
+      border-radius: 40px;
+      letter-spacing: 1px;
+      box-shadow: inset 0 -2px 0 #b9b07b;
+    }
+
+    .reset-btn {
+      background: #e0b354;
+      border: none;
+      color: #1b2d38;
+      font-size: 1.2rem;
+      font-weight: bold;
+      padding: 6px 22px;
+      border-radius: 40px;
+      cursor: pointer;
+      box-shadow: 0 6px 0 #8f6f2f, 0 4px 8px rgba(0,0,0,0.4);
+      transition: 0.07s ease;
+      letter-spacing: 0.5px;
+    }
+
+    .reset-btn:active {
+      transform: translateY(6px);
+      box-shadow: 0 1px 0 #8f6f2f;
+    }
+
+    .reset-btn:hover {
+      background: #f5c86a;
+    }
+
+    .game-field {
+      position: relative;
+      background: #274552;
+      border-radius: 40px;
+      height: 380px;
+      width: 100%;
+      box-shadow: inset 0 0 0 2px #3b6172, inset 0 10px 20px rgba(0,0,0,0.5);
+      overflow: hidden;
+      margin-bottom: 12px;
+      cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="14" fill="%23f5d742" opacity="0.6"/><circle cx="16" cy="16" r="8" fill="%23f5b042" opacity="0.7"/></svg>') 16 16, pointer;
+      touch-action: none;
+    }
+
+    .coin {
+      position: absolute;
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #fae97b, #d4a017);
+      box-shadow: 0 6px 0 #8b6f2a, 0 10px 18px rgba(0,0,0,0.5), inset 0 -4px 6px rgba(0,0,0,0.3), inset 0 4px 8px #fff4b0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      font-weight: bold;
+      color: #b8860b;
+      text-shadow: 0 1px 0 #ffecb0, 0 2px 0 #7a5d1a;
+      transition: transform 0.08s ease;
+      transform: scale(0.8);
+      animation: pop-in 0.2s forwards;
+      cursor: pointer;
+      touch-action: none;
+      will-change: transform;
+      pointer-events: auto;
+    }
+
+    @keyframes pop-in {
+      0% { transform: scale(0.2); opacity: 0.3; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .coin:active {
+      transform: scale(0.75) !important;
+      box-shadow: 0 2px 0 #8b6f2a, 0 6px 12px rgba(0,0,0,0.5);
+      transition: 0.02s;
+    }
+
+    .coin::after {
+      content: "✦";
+      font-size: 30px;
+      color: #fcedb3;
+      text-shadow: 0 1px 4px #a77d1a;
+      transform: rotate(8deg);
+    }
+
+    .message-area {
+      background: #1b333f;
+      padding: 10px 16px;
+      border-radius: 60px;
+      text-align: center;
+      color: #f3e9c0;
+      font-weight: 500;
+      font-size: 1.1rem;
+      letter-spacing: 0.3px;
+      box-shadow: inset 0 3px 6px rgba(0,0,0,0.5);
+      min-height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: 0.1s;
+    }
+
+    .message-area span {
+      background: #2f5263;
+      padding: 4px 16px;
+      border-radius: 40px;
+    }
+
+    .footer {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 8px;
+      color: #7999a8;
+      font-size: 0.8rem;
+      padding: 0 8px;
+      letter-spacing: 0.5px;
+    }
+
+    @media (max-width: 480px) {
+      .game-wrapper { padding: 16px; }
+      .game-field { height: 300px; }
+      .coin { width: 48px; height: 48px; }
+      .coin::after { font-size: 24px; }
+      .stats { font-size: 1rem; padding: 8px 12px; }
+      .reset-btn { font-size: 1rem; padding: 4px 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="game-wrapper">
+  <div class="game-panel">
+
+    <div class="stats">
+      <div class="score-box">💰 <span id="scoreDisplay">0</span></div>
+      <button class="reset-btn" id="resetGameBtn">⟳ Сброс</button>
+    </div>
+
+    <div class="game-field" id="gameField">
+      <!-- Монетки будут появляться здесь -->
+    </div>
+
+    <div class="message-area" id="messageArea">
+      <span>🍀 Лови монетку!</span>
+    </div>
+    <div class="footer">⚡ кликни по золоту</div>
+
+  </div>
+</div>
+
+<script>
+  (function(){
+    const gameField = document.getElementById('gameField');
+    const scoreSpan = document.getElementById('scoreDisplay');
+    const messageArea = document.getElementById('messageArea');
+
+    // ----- Игровое состояние -----
+    let score = 0;
+    let coinsOnField = 0;           // сколько монет сейчас на поле
+    const MAX_COINS = 5;            // максимум монет одновременно
+    let spawnTimer = null;
+    let gameActive = true;
+
+    // ---- Вспомогательные функции ----
+    function updateScoreUI() {
+      scoreSpan.textContent = score;
+    }
+
+    function setMessage(text, emoji = '✨') {
+      messageArea.innerHTML = `<span>${emoji} ${text}</span>`;
+    }
+
+    // ---- Создание монетки ----
+    function createCoin() {
+      if (!gameActive) return null;
+      if (coinsOnField >= MAX_COINS) return null;
+
+      const fieldRect = gameField.getBoundingClientRect();
+      // Размеры поля (с учётом возможного скролла/пикселей)
+      const fieldWidth = gameField.clientWidth;
+      const fieldHeight = gameField.clientHeight;
+      
+      // Размер монеты (примерный, чтобы не вылезала)
+      const coinSize = Math.min(fieldWidth, fieldHeight) * 0.13 + 20;  // от 40 до 80px примерно
+      const coinSizePx = Math.min(80, Math.max(44, coinSize));
+      
+      // Случайные координаты (с учётом отступов, чтобы монета не обрезалась)
+      const padding = coinSizePx * 0.5 + 4;
+      const maxX = fieldWidth - coinSizePx - padding;
+      const maxY = fieldHeight - coinSizePx - padding;
+      
+      if (maxX < 10 || maxY < 10) return null; // поле слишком маленькое
+
+      const x = Math.floor(Math.random() * (maxX - 10) + padding);
+      const y = Math.floor(Math.random() * (maxY - 10) + padding);
+
+      // Создаём DOM-элемент
+      const coin = document.createElement('div');
+      coin.className = 'coin';
+      coin.style.width = coinSizePx + 'px';
+      coin.style.height = coinSizePx + 'px';
+      coin.style.left = x + 'px';
+      coin.style.top = y + 'px';
+      // Добавляем анимацию появления через CSS (pop-in)
+      
+      // Обработчик клика (ловит монету)
+      coin.addEventListener('click', function catchCoin(e) {
+        e.stopPropagation();
+        if (!gameActive) return;
+        if (!this.parentNode) return; // уже удалена
+
+        // Увеличиваем счёт
+        score++;
+        updateScoreUI();
+        setMessage('+1 монета! 🪙', '🎉');
+
+        // Визуальный фидбек — быстрая анимация исчезновения
+        this.style.transition = 'transform 0.08s, opacity 0.15s';
+        this.style.transform = 'scale(2)';
+        this.style.opacity = '0';
+        
+        // Удаляем из DOM и уменьшаем счётчик
+        setTimeout(() => {
+          if (this.parentNode) {
+            this.remove();
+            coinsOnField--;
+            // проверим, не нужно ли срочно добавить новую монету
+            if (gameActive && coinsOnField < MAX_COINS) {
+              // Можно добавить одну монету с небольшой задержкой, чтобы не спамить
+              setTimeout(() => { if (gameActive) trySpawnCoin(); }, 100);
+            }
+          }
+        }, 120);
+      });
+
+      // Добавляем на поле
+      gameField.appendChild(coin);
+      coinsOnField++;
+      
+      // Устанавливаем таймер самоудаления, если монету не поймали (через 5-7 секунд)
+      const lifeTime = 4000 + Math.floor(Math.random() * 2500);
+      const timeoutId = setTimeout(() => {
+        // Если монета всё ещё на поле и игра активна — удаляем с грустным сообщением
+        if (coin.parentNode && gameActive) {
+          coin.style.transition = 'transform 0.2s, opacity 0.2s';
+          coin.style.transform = 'scale(0.1)';
+          coin.style.opacity = '0';
+          setTimeout(() => {
+            if (coin.parentNode) {
+              coin.remove();
+              coinsOnField--;
+              setMessage('Монетка исчезла... 😢', '💨');
+              // Попробуем заполнить
+              if (gameActive && coinsOnField < MAX_COINS) {
+                setTimeout(() => trySpawnCoin(), 200);
+              }
+            }
+          }, 180);
+        }
+      }, lifeTime);
+
+      // Сохраним таймер в элементе, чтобы отменить при клике/удалении
+      coin.dataset.timeoutId = timeoutId;
+
+      return coin;
+    }
+
+    // ---- Попытка спавна одной монетки ----
+    function trySpawnCoin() {
+      if (!gameActive) return false;
+      if (coinsOnField >= MAX_COINS) return false;
+      const coin = createCoin();
+      if (coin) {
+        return true;
+      }
+      return false;
+    }
+
+    // ---- Заполнить поле до максимума (при старте / ресете) ----
+    function fillField() {
+      if (!gameActive) return;
+      // Очищаем текущие монеты (без анимации)
+      clearCoins();
+      // Создаём новые
+      let spawned = 0;
+      for (let i = 0; i < MAX_COINS; i++) {
+        const success = trySpawnCoin();
+        if (success) spawned++;
+        // если не получилось (маленькое поле) — выходим
+        if (!success && i > 3) break;
+      }
+      if (spawned === 0) {
+        setMessage('Поле слишком мало 😅', '📏');
+      } else {
+        setMessage('Игра началась! 🍀', '🌟');
+      }
+    }
+
+    // ---- Очистка всех монет с поля (без анимации) ----
+    function clearCoins() {
+      const coins = gameField.querySelectorAll('.coin');
+      coins.forEach(coin => {
+        // Отменяем таймер самоудаления
+        if (coin.dataset.timeoutId) {
+          clearTimeout(parseInt(coin.dataset.timeoutId));
+        }
+        coin.remove();
+      });
+      coinsOnField = 0;
+    }
+
+    // ---- Сброс игры ----
+    function resetGame() {
+      // Останавливаем игру на мгновение
+      gameActive = false;
+      
+      // Сбрасываем таймеры спавна
+      if (spawnTimer) {
+        clearInterval(spawnTimer);
+        spawnTimer = null;
+      }
+
+      // Удаляем все монеты
+      clearCoins();
+
+      // Сбрасываем счёт
+      score = 0;
+      updateScoreUI();
+      
+      // Сообщение
+      setMessage('Новая игра!', '🔄');
+
+      // Активируем игру снова
+      gameActive = true;
+
+      // Заполняем поле монетами
+      fillField();
+
+      // Запускаем спавн каждые 1.5–2.5 сек (если монет меньше максимума)
+      if (spawnTimer) clearInterval(spawnTimer);
+      spawnTimer = setInterval(() => {
+        if (!gameActive) return;
+        // Если монет меньше максимума — пробуем добавить
+        if (coinsOnField < MAX_COINS) {
+          trySpawnCoin();
+          // Если после попытки всё ещё мало — повторим ещё разок через короткий интервал
+          if (coinsOnField < MAX_COINS) {
+            // не жадничаем, но попробуем ещё через 400мс
+            setTimeout(() => {
+              if (gameActive && coinsOnField < MAX_COINS) trySpawnCoin();
+            }, 300);
+          }
+        }
+      }, 1800 + Math.floor(Math.random() * 1000));
+    }
+
+    // ---- Обработчик ресета по кнопке ----
+    document.getElementById('resetGameBtn').addEventListener('click', function() {
+      resetGame();
+    });
+
+    // ---- Запуск игры при загрузке ----
+    function initGame() {
+      // Убедимся, что поле чистое
+      clearCoins();
+      gameActive = true;
+      score = 0;
+      updateScoreUI();
+      setMessage('Загрузка...', '⏳');
+      
+      // Небольшая задержка для рендера
+      setTimeout(() => {
+        fillField();
+        // Запускаем интервал спавна
+        if (spawnTimer) clearInterval(spawnTimer);
+        spawnTimer = setInterval(() => {
+          if (!gameActive) return;
+          if (coinsOnField < MAX_COINS) {
+            trySpawnCoin();
+            // дополнительная попытка, если не получилось
+            if (coinsOnField < MAX_COINS) {
+              setTimeout(() => {
+                if (gameActive && coinsOnField < MAX_COINS) trySpawnCoin();
+              }, 300);
+            }
+          }
+        }, 2000 + Math.floor(Math.random() * 1500));
+      }, 100);
+    }
+
+    // ---- Обработка изменения размера окна (пересчёт) ----
+    let resizeTimeout = null;
+    window.addEventListener('resize', function() {
+      // Просто перезапускаем игру, чтобы монеты не вылезали (мягко)
+      if (resizeTimeout) clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(() => {
+        if (gameActive) {
+          // Сохраняем счёт, обновляем поле
+          const oldScore = score;
+          gameActive = false;
+          if (spawnTimer) clearInterval(spawnTimer);
+          clearCoins();
+          gameActive = true;
+          score = oldScore;
+          updateScoreUI();
+          fillField();
+          // перезапуск интервала
+          if (spawnTimer) clearInterval(spawnTimer);
+          spawnTimer = setInterval(() => {
+            if (!gameActive) return;
+            if (coinsOnField < MAX_COINS) {
+              trySpawnCoin();
+              if (coinsOnField < MAX_COINS) {
+                setTimeout(() => {
+                  if (gameActive && coinsOnField < MAX_COINS) trySpawnCoin();
+                }, 300);
+              }
+            }
+          }, 2000 + Math.floor(Math.random() * 1500));
+          setMessage('Окно изменено', '📐');
+        }
+      }, 500);
+    });
+
+    // Стартуем!
+    initGame();
+
+    // Доп. защита: если клик по полю (не по монете) — ничего не делаем, но можно подсказать
+    gameField.addEventListener('click', function(e) {
+      if (e.target === gameField) {
+        setMessage('Кликни по монетке! 🪙', '👆');
+      }
+    });
+
+    // Очистка таймеров при выгрузке страницы (необязательно)
+    window.addEventListener('beforeunload', function() {
+      if (spawnTimer) clearInterval(spawnTimer);
+    });
+
+  })();
+</script>
+</body>
+</html>
