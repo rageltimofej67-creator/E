@@ -1,497 +1,396 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>🍀 Поймай монетку</title>
-  <style>
-    * {
-      box-sizing: border-box;
-      user-select: none;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎮 Ретро-платформа | Игры 80-х</title>
+    <style>
+        /* Глобальный ретро-стиль */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Courier New', Courier, 'VT323', monospace;
+        }
 
-    body {
-      margin: 0;
-      min-height: 100vh;
-      background: linear-gradient(145deg, #1e3c4f, #0e2a3a);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
-      padding: 16px;
-    }
+        body {
+            background: linear-gradient(145deg, #0b0e14 0%, #1a1f2c 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            margin: 0;
+        }
 
-    .game-wrapper {
-      background: #2d4d5e;
-      padding: 24px 24px 30px;
-      border-radius: 60px 60px 40px 40px;
-      box-shadow: 0 20px 30px rgba(0, 0, 0, 0.6), inset 0 2px 4px rgba(255, 255, 255, 0.1);
-      max-width: 650px;
-      width: 100%;
-    }
+        /* Главный контейнер — как старый монитор */
+        .retro-shell {
+            max-width: 1100px;
+            width: 100%;
+            background: #1e2533;
+            padding: 30px 25px 35px;
+            border-radius: 40px 40px 20px 20px;
+            box-shadow: 
+                0 20px 40px rgba(0,0,0,0.8),
+                inset 0 0 0 2px #4a5568,
+                inset 0 0 20px #0a0c12;
+            border-bottom: 8px solid #2d3648;
+            position: relative;
+            transition: 0.2s;
+        }
 
-    .game-panel {
-      background: #1f3b48;
-      border-radius: 40px;
-      padding: 20px 20px 24px;
-      box-shadow: inset 0 6px 10px rgba(0, 0, 0, 0.5), 0 4px 8px rgba(0, 0, 0, 0.3);
-    }
+        /* Эффект "свечения" экрана */
+        .retro-shell::before {
+            content: '';
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            bottom: 10px;
+            background: radial-gradient(circle at 20% 30%, rgba(255,255,240,0.03) 0%, transparent 70%);
+            pointer-events: none;
+            border-radius: 30px;
+        }
 
-    .stats {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: #0f2937;
-      padding: 12px 20px;
-      border-radius: 50px;
-      margin-bottom: 20px;
-      color: #f2e9c7;
-      font-weight: 600;
-      font-size: 1.3rem;
-      box-shadow: inset 0 3px 6px rgba(0,0,0,0.6);
-    }
+        /* Шапка с неоном */
+        .header {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: baseline;
+            border-bottom: 3px solid #f7d44a;
+            padding-bottom: 18px;
+            margin-bottom: 30px;
+            text-shadow: 0 0 8px #f7b32b;
+        }
 
-    .score-box {
-      background: #2d4f5e;
-      padding: 6px 18px;
-      border-radius: 40px;
-      letter-spacing: 1px;
-      box-shadow: inset 0 -2px 0 #b9b07b;
-    }
+        .header h1 {
+            font-size: 3.2rem;
+            font-weight: 700;
+            letter-spacing: 4px;
+            color: #f7d44a;
+            background: linear-gradient(180deg, #ffde6b, #d49c1a);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 15px #f7b32b55;
+            font-family: 'Courier New', monospace;
+            text-transform: uppercase;
+            transform: skew(-3deg);
+        }
 
-    .reset-btn {
-      background: #e0b354;
-      border: none;
-      color: #1b2d38;
-      font-size: 1.2rem;
-      font-weight: bold;
-      padding: 6px 22px;
-      border-radius: 40px;
-      cursor: pointer;
-      box-shadow: 0 6px 0 #8f6f2f, 0 4px 8px rgba(0,0,0,0.4);
-      transition: 0.07s ease;
-      letter-spacing: 0.5px;
-    }
+        .header .sub {
+            color: #b6c7e0;
+            font-size: 1.2rem;
+            background: #2b3347;
+            padding: 6px 18px;
+            border-radius: 40px;
+            border: 1px solid #5d6f8a;
+            box-shadow: inset 0 0 8px #0f121b;
+            letter-spacing: 2px;
+        }
 
-    .reset-btn:active {
-      transform: translateY(6px);
-      box-shadow: 0 1px 0 #8f6f2f;
-    }
+        /* Сетка игр — стиль картриджей */
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 28px 20px;
+            margin: 30px 0 20px;
+        }
 
-    .reset-btn:hover {
-      background: #f5c86a;
-    }
+        .game-card {
+            background: #252f40;
+            border-radius: 30px 12px 30px 12px;
+            padding: 16px 12px 20px;
+            box-shadow: 
+                0 12px 0 #0f131e,
+                0 8px 20px rgba(0,0,0,0.6),
+                inset 0 -4px 0 #3b465e;
+            border-left: 2px solid #4d5d78;
+            border-right: 2px solid #1f2635;
+            transition: all 0.1s ease;
+            cursor: default;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            color: #d0def0;
+        }
 
-    .game-field {
-      position: relative;
-      background: #274552;
-      border-radius: 40px;
-      height: 380px;
-      width: 100%;
-      box-shadow: inset 0 0 0 2px #3b6172, inset 0 10px 20px rgba(0,0,0,0.5);
-      overflow: hidden;
-      margin-bottom: 12px;
-      cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="14" fill="%23f5d742" opacity="0.6"/><circle cx="16" cy="16" r="8" fill="%23f5b042" opacity="0.7"/></svg>') 16 16, pointer;
-      touch-action: none;
-    }
+        .game-card:hover {
+            transform: translateY(-6px) scale(1.02);
+            box-shadow: 
+                0 18px 0 #0f131e,
+                0 20px 30px rgba(0,0,0,0.8),
+                inset 0 -4px 0 #5d71a0;
+            border-left-color: #f7d44a;
+            border-right-color: #f7d44a;
+            transition: 0.08s linear;
+        }
 
-    .coin {
-      position: absolute;
-      width: 58px;
-      height: 58px;
-      border-radius: 50%;
-      background: radial-gradient(circle at 30% 30%, #fae97b, #d4a017);
-      box-shadow: 0 6px 0 #8b6f2a, 0 10px 18px rgba(0,0,0,0.5), inset 0 -4px 6px rgba(0,0,0,0.3), inset 0 4px 8px #fff4b0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 28px;
-      font-weight: bold;
-      color: #b8860b;
-      text-shadow: 0 1px 0 #ffecb0, 0 2px 0 #7a5d1a;
-      transition: transform 0.08s ease;
-      transform: scale(0.8);
-      animation: pop-in 0.2s forwards;
-      cursor: pointer;
-      touch-action: none;
-      will-change: transform;
-      pointer-events: auto;
-    }
+        .game-card .icon {
+            font-size: 4.4rem;
+            line-height: 1.2;
+            filter: drop-shadow(0 6px 0 #0b0e14);
+            margin-bottom: 6px;
+            background: #1b212e;
+            padding: 6px 16px;
+            border-radius: 60px;
+            border: 1px solid #4a5a74;
+            width: 100%;
+        }
 
-    @keyframes pop-in {
-      0% { transform: scale(0.2); opacity: 0.3; }
-      100% { transform: scale(1); opacity: 1; }
-    }
+        .game-card h3 {
+            font-size: 1.9rem;
+            font-weight: 700;
+            color: #f0e9d0;
+            text-shadow: 0 2px 0 #1f1f1f;
+            letter-spacing: 1px;
+            margin: 8px 0 4px;
+            background: #1e2636;
+            padding: 0 12px;
+            border-radius: 30px;
+            display: inline-block;
+            border-bottom: 2px solid #f7b32b;
+        }
 
-    .coin:active {
-      transform: scale(0.75) !important;
-      box-shadow: 0 2px 0 #8b6f2a, 0 6px 12px rgba(0,0,0,0.5);
-      transition: 0.02s;
-    }
+        .game-card .year {
+            font-size: 1rem;
+            background: #1b212e;
+            padding: 2px 14px;
+            border-radius: 30px;
+            border: 1px solid #4c5c77;
+            color: #b0c5e0;
+            margin: 6px 0 10px;
+        }
 
-    .coin::after {
-      content: "✦";
-      font-size: 30px;
-      color: #fcedb3;
-      text-shadow: 0 1px 4px #a77d1a;
-      transform: rotate(8deg);
-    }
+        .game-card .desc {
+            font-size: 0.95rem;
+            line-height: 1.4;
+            color: #b8cbeb;
+            background: #1a212e;
+            padding: 8px 12px;
+            border-radius: 20px;
+            width: 100%;
+            border: 1px dashed #5f7290;
+        }
 
-    .message-area {
-      background: #1b333f;
-      padding: 10px 16px;
-      border-radius: 60px;
-      text-align: center;
-      color: #f3e9c0;
-      font-weight: 500;
-      font-size: 1.1rem;
-      letter-spacing: 0.3px;
-      box-shadow: inset 0 3px 6px rgba(0,0,0,0.5);
-      min-height: 52px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: 0.1s;
-    }
+        /* Ретро-кнопка "play" */
+        .play-btn {
+            display: inline-block;
+            margin-top: 16px;
+            background: #f7d44a;
+            color: #141a26;
+            font-weight: 800;
+            font-size: 1.5rem;
+            padding: 8px 28px;
+            border-radius: 60px;
+            text-decoration: none;
+            letter-spacing: 3px;
+            box-shadow: 0 8px 0 #9e7c1a, 0 4px 16px #f7b32b77;
+            border: 1px solid #ffea8a;
+            transition: 0.06s linear;
+            text-shadow: 0 1px 0 #ffeeaa;
+            width: 100%;
+            text-align: center;
+        }
 
-    .message-area span {
-      background: #2f5263;
-      padding: 4px 16px;
-      border-radius: 40px;
-    }
+        .play-btn:hover {
+            transform: translateY(4px);
+            box-shadow: 0 4px 0 #9e7c1a, 0 8px 20px #f7b32b99;
+            background: #ffe074;
+        }
 
-    .footer {
-      display: flex;
-      justify-content: flex-end;
-      margin-top: 8px;
-      color: #7999a8;
-      font-size: 0.8rem;
-      padding: 0 8px;
-      letter-spacing: 0.5px;
-    }
+        .play-btn:active {
+            transform: translateY(8px);
+            box-shadow: 0 0px 0 #9e7c1a;
+        }
 
-    @media (max-width: 480px) {
-      .game-wrapper { padding: 16px; }
-      .game-field { height: 300px; }
-      .coin { width: 48px; height: 48px; }
-      .coin::after { font-size: 24px; }
-      .stats { font-size: 1rem; padding: 8px 12px; }
-      .reset-btn { font-size: 1rem; padding: 4px 16px; }
-    }
-  </style>
+        /* Нижняя часть — как панель управления */
+        .footer-panel {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 3px double #4f6180;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            color: #8b9fc0;
+            font-size: 1.1rem;
+            text-shadow: 0 2px 0 #0b0e14;
+        }
+
+        .footer-panel .badge {
+            background: #1a212e;
+            padding: 4px 20px;
+            border-radius: 30px;
+            border: 1px solid #43536b;
+            letter-spacing: 1px;
+        }
+
+        .footer-panel .badge i {
+            font-style: normal;
+            color: #f7d44a;
+            margin-right: 6px;
+        }
+
+        .footer-panel .controls {
+            display: flex;
+            gap: 20px;
+        }
+
+        .footer-panel .controls span {
+            background: #1e2636;
+            padding: 0 16px;
+            border-radius: 20px;
+            border-bottom: 3px solid #f7b32b;
+            color: #d6e2f5;
+        }
+
+        /* Адаптив */
+        @media (max-width: 640px) {
+            .header h1 {
+                font-size: 2.4rem;
+            }
+            .header .sub {
+                font-size: 0.9rem;
+                padding: 3px 12px;
+            }
+            .game-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 16px;
+            }
+            .game-card .icon {
+                font-size: 3.4rem;
+            }
+            .play-btn {
+                font-size: 1.2rem;
+                padding: 6px 8px;
+            }
+        }
+
+        @media (max-width: 440px) {
+            .game-grid {
+                grid-template-columns: 1fr;
+            }
+            .retro-shell {
+                padding: 16px;
+            }
+        }
+
+        /* Дополнительный ретро-шум (CSS-зерно) */
+        .scanlines {
+            position: relative;
+            overflow: hidden;
+        }
+        .scanlines::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(0deg, rgba(0,0,0,0.03) 0px, rgba(255,255,255,0.02) 2px, transparent 4px, transparent 6px);
+            pointer-events: none;
+            border-radius: 30px;
+        }
+    </style>
 </head>
 <body>
-
-<div class="game-wrapper">
-  <div class="game-panel">
-
-    <div class="stats">
-      <div class="score-box">💰 <span id="scoreDisplay">0</span></div>
-      <button class="reset-btn" id="resetGameBtn">⟳ Сброс</button>
+<div class="retro-shell scanlines">
+    <!-- Шапка -->
+    <div class="header">
+        <h1>🕹️ RETRO·ARC</h1>
+        <span class="sub">◈ 1980–1990 ◈</span>
     </div>
 
-    <div class="game-field" id="gameField">
-      <!-- Монетки будут появляться здесь -->
+    <!-- Сетка игр -->
+    <div class="game-grid">
+        <!-- Игра 1 -->
+        <div class="game-card">
+            <div class="icon">👾</div>
+            <h3>SPACE·INV</h3>
+            <div class="year">1978</div>
+            <div class="desc">Классика стрельбы по пришельцам</div>
+            <a href="#" class="play-btn">▶ PLAY</a>
+        </div>
+        <!-- Игра 2 -->
+        <div class="game-card">
+            <div class="icon">🏰</div>
+            <h3>PAC·MAZE</h3>
+            <div class="year">1980</div>
+            <div class="desc">Лабиринт, точки и призраки</div>
+            <a href="#" class="play-btn">▶ PLAY</a>
+        </div>
+        <!-- Игра 3 -->
+        <div class="game-card">
+            <div class="icon">🦍</div>
+            <h3>DONKEY·KONG</h3>
+            <div class="year">1981</div>
+            <div class="desc">Спаси принцессу от гигантской обезьяны</div>
+            <a href="#" class="play-btn">▶ PLAY</a>
+        </div>
+        <!-- Игра 4 -->
+        <div class="game-card">
+            <div class="icon">🚀</div>
+            <h3>ASTEROID</h3>
+            <div class="year">1979</div>
+            <div class="desc">Уничтожай астероиды в открытом космосе</div>
+            <a href="#" class="play-btn">▶ PLAY</a>
+        </div>
+        <!-- Игра 5 -->
+        <div class="game-card">
+            <div class="icon">🧱</div>
+            <h3>BREAKOUT</h3>
+            <div class="year">1976</div>
+            <div class="desc">Разбей все блоки мячом и ракеткой</div>
+            <a href="#" class="play-btn">▶ PLAY</a>
+        </div>
+        <!-- Игра 6 -->
+        <div class="game-card">
+            <div class="icon">🏁</div>
+            <h3>POLE·POS.</h3>
+            <div class="year">1982</div>
+            <div class="desc">Гоночный симулятор с видом сверху</div>
+            <a href="#" class="play-btn">▶ PLAY</a>
+        </div>
+        <!-- Игра 7 -->
+        <div class="game-card">
+            <div class="icon">🐍</div>
+            <h3>SNAKE·WARS</h3>
+            <div class="year">1983</div>
+            <div class="desc">Классическая змейка на арене</div>
+            <a href="#" class="play-btn">▶ PLAY</a>
+        </div>
+        <!-- Игра 8 -->
+        <div class="game-card">
+            <div class="icon">🧙</div>
+            <h3>DRAGON·Q.</h3>
+            <div class="year">1986</div>
+            <div class="desc">Ролевое приключение в духе 8-бит</div>
+            <a href="#" class="play-btn">▶ PLAY</a>
+        </div>
     </div>
 
-    <div class="message-area" id="messageArea">
-      <span>🍀 Лови монетку!</span>
+    <!-- Нижняя панель с "лампочками" -->
+    <div class="footer-panel">
+        <div class="badge">
+            <i>⬤</i> ONLINE · 8-BIT
+        </div>
+        <div class="controls">
+            <span>⟳ 60Hz</span>
+            <span>📀 128KB</span>
+            <span>🕹️ JOY</span>
+        </div>
+        <div class="badge" style="background: #1f2840; border-color: #f7b32b;">
+            <i>★</i> 1986 · ARCADE
+        </div>
     </div>
-    <div class="footer">⚡ кликни по золоту</div>
 
-  </div>
+    <!-- Маленькая ретро-подпись -->
+    <div style="margin-top: 18px; text-align: center; color: #4e6188; font-size: 0.8rem; letter-spacing: 3px; border-top: 1px dotted #36445e; padding-top: 16px;">
+        ⚡ INSERT COIN · PRESS START ⚡
+    </div>
 </div>
-
-<script>
-  (function(){
-    const gameField = document.getElementById('gameField');
-    const scoreSpan = document.getElementById('scoreDisplay');
-    const messageArea = document.getElementById('messageArea');
-
-    // ----- Игровое состояние -----
-    let score = 0;
-    let coinsOnField = 0;           // сколько монет сейчас на поле
-    const MAX_COINS = 5;            // максимум монет одновременно
-    let spawnTimer = null;
-    let gameActive = true;
-
-    // ---- Вспомогательные функции ----
-    function updateScoreUI() {
-      scoreSpan.textContent = score;
-    }
-
-    function setMessage(text, emoji = '✨') {
-      messageArea.innerHTML = `<span>${emoji} ${text}</span>`;
-    }
-
-    // ---- Создание монетки ----
-    function createCoin() {
-      if (!gameActive) return null;
-      if (coinsOnField >= MAX_COINS) return null;
-
-      const fieldRect = gameField.getBoundingClientRect();
-      // Размеры поля (с учётом возможного скролла/пикселей)
-      const fieldWidth = gameField.clientWidth;
-      const fieldHeight = gameField.clientHeight;
-      
-      // Размер монеты (примерный, чтобы не вылезала)
-      const coinSize = Math.min(fieldWidth, fieldHeight) * 0.13 + 20;  // от 40 до 80px примерно
-      const coinSizePx = Math.min(80, Math.max(44, coinSize));
-      
-      // Случайные координаты (с учётом отступов, чтобы монета не обрезалась)
-      const padding = coinSizePx * 0.5 + 4;
-      const maxX = fieldWidth - coinSizePx - padding;
-      const maxY = fieldHeight - coinSizePx - padding;
-      
-      if (maxX < 10 || maxY < 10) return null; // поле слишком маленькое
-
-      const x = Math.floor(Math.random() * (maxX - 10) + padding);
-      const y = Math.floor(Math.random() * (maxY - 10) + padding);
-
-      // Создаём DOM-элемент
-      const coin = document.createElement('div');
-      coin.className = 'coin';
-      coin.style.width = coinSizePx + 'px';
-      coin.style.height = coinSizePx + 'px';
-      coin.style.left = x + 'px';
-      coin.style.top = y + 'px';
-      // Добавляем анимацию появления через CSS (pop-in)
-      
-      // Обработчик клика (ловит монету)
-      coin.addEventListener('click', function catchCoin(e) {
-        e.stopPropagation();
-        if (!gameActive) return;
-        if (!this.parentNode) return; // уже удалена
-
-        // Увеличиваем счёт
-        score++;
-        updateScoreUI();
-        setMessage('+1 монета! 🪙', '🎉');
-
-        // Визуальный фидбек — быстрая анимация исчезновения
-        this.style.transition = 'transform 0.08s, opacity 0.15s';
-        this.style.transform = 'scale(2)';
-        this.style.opacity = '0';
-        
-        // Удаляем из DOM и уменьшаем счётчик
-        setTimeout(() => {
-          if (this.parentNode) {
-            this.remove();
-            coinsOnField--;
-            // проверим, не нужно ли срочно добавить новую монету
-            if (gameActive && coinsOnField < MAX_COINS) {
-              // Можно добавить одну монету с небольшой задержкой, чтобы не спамить
-              setTimeout(() => { if (gameActive) trySpawnCoin(); }, 100);
-            }
-          }
-        }, 120);
-      });
-
-      // Добавляем на поле
-      gameField.appendChild(coin);
-      coinsOnField++;
-      
-      // Устанавливаем таймер самоудаления, если монету не поймали (через 5-7 секунд)
-      const lifeTime = 4000 + Math.floor(Math.random() * 2500);
-      const timeoutId = setTimeout(() => {
-        // Если монета всё ещё на поле и игра активна — удаляем с грустным сообщением
-        if (coin.parentNode && gameActive) {
-          coin.style.transition = 'transform 0.2s, opacity 0.2s';
-          coin.style.transform = 'scale(0.1)';
-          coin.style.opacity = '0';
-          setTimeout(() => {
-            if (coin.parentNode) {
-              coin.remove();
-              coinsOnField--;
-              setMessage('Монетка исчезла... 😢', '💨');
-              // Попробуем заполнить
-              if (gameActive && coinsOnField < MAX_COINS) {
-                setTimeout(() => trySpawnCoin(), 200);
-              }
-            }
-          }, 180);
-        }
-      }, lifeTime);
-
-      // Сохраним таймер в элементе, чтобы отменить при клике/удалении
-      coin.dataset.timeoutId = timeoutId;
-
-      return coin;
-    }
-
-    // ---- Попытка спавна одной монетки ----
-    function trySpawnCoin() {
-      if (!gameActive) return false;
-      if (coinsOnField >= MAX_COINS) return false;
-      const coin = createCoin();
-      if (coin) {
-        return true;
-      }
-      return false;
-    }
-
-    // ---- Заполнить поле до максимума (при старте / ресете) ----
-    function fillField() {
-      if (!gameActive) return;
-      // Очищаем текущие монеты (без анимации)
-      clearCoins();
-      // Создаём новые
-      let spawned = 0;
-      for (let i = 0; i < MAX_COINS; i++) {
-        const success = trySpawnCoin();
-        if (success) spawned++;
-        // если не получилось (маленькое поле) — выходим
-        if (!success && i > 3) break;
-      }
-      if (spawned === 0) {
-        setMessage('Поле слишком мало 😅', '📏');
-      } else {
-        setMessage('Игра началась! 🍀', '🌟');
-      }
-    }
-
-    // ---- Очистка всех монет с поля (без анимации) ----
-    function clearCoins() {
-      const coins = gameField.querySelectorAll('.coin');
-      coins.forEach(coin => {
-        // Отменяем таймер самоудаления
-        if (coin.dataset.timeoutId) {
-          clearTimeout(parseInt(coin.dataset.timeoutId));
-        }
-        coin.remove();
-      });
-      coinsOnField = 0;
-    }
-
-    // ---- Сброс игры ----
-    function resetGame() {
-      // Останавливаем игру на мгновение
-      gameActive = false;
-      
-      // Сбрасываем таймеры спавна
-      if (spawnTimer) {
-        clearInterval(spawnTimer);
-        spawnTimer = null;
-      }
-
-      // Удаляем все монеты
-      clearCoins();
-
-      // Сбрасываем счёт
-      score = 0;
-      updateScoreUI();
-      
-      // Сообщение
-      setMessage('Новая игра!', '🔄');
-
-      // Активируем игру снова
-      gameActive = true;
-
-      // Заполняем поле монетами
-      fillField();
-
-      // Запускаем спавн каждые 1.5–2.5 сек (если монет меньше максимума)
-      if (spawnTimer) clearInterval(spawnTimer);
-      spawnTimer = setInterval(() => {
-        if (!gameActive) return;
-        // Если монет меньше максимума — пробуем добавить
-        if (coinsOnField < MAX_COINS) {
-          trySpawnCoin();
-          // Если после попытки всё ещё мало — повторим ещё разок через короткий интервал
-          if (coinsOnField < MAX_COINS) {
-            // не жадничаем, но попробуем ещё через 400мс
-            setTimeout(() => {
-              if (gameActive && coinsOnField < MAX_COINS) trySpawnCoin();
-            }, 300);
-          }
-        }
-      }, 1800 + Math.floor(Math.random() * 1000));
-    }
-
-    // ---- Обработчик ресета по кнопке ----
-    document.getElementById('resetGameBtn').addEventListener('click', function() {
-      resetGame();
-    });
-
-    // ---- Запуск игры при загрузке ----
-    function initGame() {
-      // Убедимся, что поле чистое
-      clearCoins();
-      gameActive = true;
-      score = 0;
-      updateScoreUI();
-      setMessage('Загрузка...', '⏳');
-      
-      // Небольшая задержка для рендера
-      setTimeout(() => {
-        fillField();
-        // Запускаем интервал спавна
-        if (spawnTimer) clearInterval(spawnTimer);
-        spawnTimer = setInterval(() => {
-          if (!gameActive) return;
-          if (coinsOnField < MAX_COINS) {
-            trySpawnCoin();
-            // дополнительная попытка, если не получилось
-            if (coinsOnField < MAX_COINS) {
-              setTimeout(() => {
-                if (gameActive && coinsOnField < MAX_COINS) trySpawnCoin();
-              }, 300);
-            }
-          }
-        }, 2000 + Math.floor(Math.random() * 1500));
-      }, 100);
-    }
-
-    // ---- Обработка изменения размера окна (пересчёт) ----
-    let resizeTimeout = null;
-    window.addEventListener('resize', function() {
-      // Просто перезапускаем игру, чтобы монеты не вылезали (мягко)
-      if (resizeTimeout) clearTimeout(resizeTimeout);
-      resizeTimeout = setTimeout(() => {
-        if (gameActive) {
-          // Сохраняем счёт, обновляем поле
-          const oldScore = score;
-          gameActive = false;
-          if (spawnTimer) clearInterval(spawnTimer);
-          clearCoins();
-          gameActive = true;
-          score = oldScore;
-          updateScoreUI();
-          fillField();
-          // перезапуск интервала
-          if (spawnTimer) clearInterval(spawnTimer);
-          spawnTimer = setInterval(() => {
-            if (!gameActive) return;
-            if (coinsOnField < MAX_COINS) {
-              trySpawnCoin();
-              if (coinsOnField < MAX_COINS) {
-                setTimeout(() => {
-                  if (gameActive && coinsOnField < MAX_COINS) trySpawnCoin();
-                }, 300);
-              }
-            }
-          }, 2000 + Math.floor(Math.random() * 1500));
-          setMessage('Окно изменено', '📐');
-        }
-      }, 500);
-    });
-
-    // Стартуем!
-    initGame();
-
-    // Доп. защита: если клик по полю (не по монете) — ничего не делаем, но можно подсказать
-    gameField.addEventListener('click', function(e) {
-      if (e.target === gameField) {
-        setMessage('Кликни по монетке! 🪙', '👆');
-      }
-    });
-
-    // Очистка таймеров при выгрузке страницы (необязательно)
-    window.addEventListener('beforeunload', function() {
-      if (spawnTimer) clearInterval(spawnTimer);
-    });
-
-  })();
-</script>
 </body>
 </html>
