@@ -3,1451 +3,515 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎮 Игровая платформа | 12 игр</title>
+    <title>Игры (быстро)</title>
     <style>
-        /* ===== ГЛОБАЛЬНЫЙ СТИЛЬ ===== */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
-        }
-
-        body {
-            background: linear-gradient(135deg, #e0e5ec, #f5f7fa);
-            min-height: 100vh;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .app {
-            max-width: 1300px;
-            width: 100%;
-            background: rgba(255,255,255,0.6);
-            backdrop-filter: blur(12px);
-            border-radius: 40px;
-            padding: 30px 25px 35px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.08), 0 8px 20px rgba(0,0,0,0.02);
-            border: 1px solid rgba(255,255,255,0.5);
-        }
-
-        /* ===== ШАПКА ===== */
-        .header {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid rgba(0,0,0,0.06);
-        }
-
-        .header h1 {
-            font-size: 2.6rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, #2d3436, #0984e3);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .header .sub {
-            font-size: 1rem;
-            color: #636e72;
-            background: rgba(0,0,0,0.04);
-            padding: 8px 20px;
-            border-radius: 40px;
-            font-weight: 500;
-        }
-
-        /* ===== СЕТКА ИГР ===== */
-        .game-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
-            gap: 20px;
-            margin-bottom: 20px;
-        }
-
-        .game-card {
-            background: #ffffffcc;
-            backdrop-filter: blur(4px);
-            border-radius: 28px;
-            padding: 18px 12px 20px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.04), 0 2px 6px rgba(0,0,0,0.02);
-            border: 1px solid rgba(255,255,255,0.7);
-            transition: all 0.25s ease;
-            text-align: center;
-            cursor: default;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .game-card:hover {
-            transform: translateY(-8px) scale(1.02);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
-            background: #ffffff;
-        }
-
-        .game-card .icon {
-            font-size: 3.2rem;
-            margin-bottom: 6px;
-            line-height: 1.2;
-        }
-
-        .game-card h3 {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #2d3436;
-            margin: 6px 0 2px;
-            letter-spacing: -0.2px;
-        }
-
-        .game-card .desc {
-            font-size: 0.75rem;
-            color: #636e72;
-            background: rgba(0,0,0,0.03);
-            padding: 4px 12px;
-            border-radius: 30px;
-            margin: 4px 0 12px;
-            width: 100%;
-        }
-
-        .play-btn {
-            display: inline-block;
-            background: linear-gradient(135deg, #0984e3, #6c5ce7);
-            color: #fff;
-            font-weight: 600;
-            font-size: 1rem;
-            padding: 8px 16px;
-            border-radius: 60px;
-            border: none;
-            cursor: pointer;
-            width: 100%;
-            box-shadow: 0 4px 12px rgba(9,132,227,0.25);
-            transition: 0.15s ease;
-            letter-spacing: 0.3px;
-        }
-
-        .play-btn:hover {
-            transform: scale(1.04);
-            box-shadow: 0 8px 20px rgba(9,132,227,0.35);
-        }
-
-        .play-btn:active {
-            transform: scale(0.96);
-        }
-
-        /* ===== ИГРОВОЙ КОНТЕЙНЕР ===== */
-        #game-container {
-            display: none;
-            background: #ffffff;
-            border-radius: 28px;
-            padding: 20px;
-            margin: 20px 0 10px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.06);
-            border: 1px solid rgba(0,0,0,0.04);
-        }
-
-        #game-container.active {
-            display: block;
-        }
-
-        #game-canvas {
-            display: block;
-            margin: 0 auto;
-            background: #f0f2f5;
-            border-radius: 16px;
-            width: 100%;
-            max-width: 780px;
-            height: auto;
-            aspect-ratio: 16/10;
-            image-rendering: auto;
-            box-shadow: inset 0 0 0 1px rgba(0,0,0,0.04);
-        }
-
-        .game-controls {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 16px;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
-
-        .game-controls .info {
-            font-size: 1rem;
-            color: #2d3436;
-            background: #f1f2f6;
-            padding: 6px 18px;
-            border-radius: 40px;
-            font-weight: 500;
-        }
-
-        .close-game {
-            background: #ff6b6b;
-            color: #fff;
-            border: none;
-            padding: 8px 28px;
-            border-radius: 40px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.1s ease;
-            box-shadow: 0 4px 12px rgba(255,107,107,0.3);
-        }
-
-        .close-game:hover {
-            transform: scale(1.04);
-        }
-
-        .close-game:active {
-            transform: scale(0.94);
-        }
-
-        /* ===== ПОДВАЛ ===== */
-        .footer {
-            margin-top: 28px;
-            padding-top: 18px;
-            border-top: 1px solid rgba(0,0,0,0.05);
-            display: flex;
-            justify-content: space-between;
-            color: #636e72;
-            font-size: 0.9rem;
-            flex-wrap: wrap;
-        }
-
-        /* ===== АДАПТИВ ===== */
-        @media (max-width: 600px) {
-            .header h1 { font-size: 2rem; }
-            .game-grid { grid-template-columns: 1fr 1fr; }
-        }
-        @media (max-width: 420px) {
-            .game-grid { grid-template-columns: 1fr; }
-        }
+        * { margin:0; padding:0; box-sizing:border-box; font-family:sans-serif; }
+        body { background:#f0f2f5; padding:16px; display:flex; justify-content:center; }
+        .app { max-width:900px; width:100%; background:#fff; border-radius:24px; padding:20px; box-shadow:0 4px 20px rgba(0,0,0,0.06); }
+        .header { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
+        .header h1 { font-size:1.8rem; }
+        .grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(140px,1fr)); gap:12px; margin-bottom:16px; }
+        .card { background:#f8f9fa; border-radius:16px; padding:12px; text-align:center; transition:0.1s; cursor:default; border:1px solid #e9ecef; }
+        .card:hover { background:#e9ecef; }
+        .card .icon { font-size:2.6rem; }
+        .card h3 { font-size:0.95rem; margin:4px 0; }
+        .card .desc { font-size:0.7rem; color:#6c757d; }
+        .btn { background:#0d6efd; color:#fff; border:none; padding:6px 0; width:100%; border-radius:40px; font-weight:600; cursor:pointer; margin-top:6px; }
+        .btn:hover { background:#0b5ed7; }
+        #game-container { display:none; background:#f8f9fa; border-radius:16px; padding:12px; margin-top:12px; }
+        #game-container.active { display:block; }
+        #game-canvas { display:block; margin:0 auto; background:#fff; border-radius:8px; width:100%; max-width:640px; height:auto; aspect-ratio:16/10; }
+        .controls { display:flex; justify-content:space-between; align-items:center; margin-top:10px; flex-wrap:wrap; gap:8px; }
+        .controls .info { font-size:0.9rem; background:#e9ecef; padding:4px 16px; border-radius:30px; }
+        .close-btn { background:#dc3545; color:#fff; border:none; padding:6px 20px; border-radius:30px; font-weight:600; cursor:pointer; }
+        .close-btn:hover { background:#c82333; }
+        .footer { margin-top:16px; border-top:1px solid #dee2e6; padding-top:12px; font-size:0.8rem; color:#6c757d; display:flex; justify-content:space-between; }
+        @media (max-width:500px) { .grid { grid-template-columns:1fr 1fr; } }
     </style>
 </head>
 <body>
 <div class="app">
-    <div class="header">
-        <h1>🎮 GameHub</h1>
-        <span class="sub">12 игр · современный стиль</span>
+    <div class="header"><h1>⚡ Игры</h1><span>быстро</span></div>
+
+    <div class="grid" id="game-grid">
+        <div class="card" data-game="snake"><div class="icon">🐍</div><h3>Snake</h3><div class="desc">стрелки</div><button class="btn">Играть</button></div>
+        <div class="card" data-game="breakout"><div class="icon">🧱</div><h3>Breakout</h3><div class="desc">мышь</div><button class="btn">Играть</button></div>
+        <div class="card" data-game="tictac"><div class="icon">❌⭕</div><h3>Крестики</h3><div class="desc">клик</div><button class="btn">Играть</button></div>
+        <div class="card" data-game="guess"><div class="icon">🔢</div><h3>Угадай</h3><div class="desc">ввод</div><button class="btn">Играть</button></div>
+        <div class="card" data-game="memory"><div class="icon">🃏</div><h3>Memory</h3><div class="desc">клик</div><button class="btn">Играть</button></div>
+        <div class="card" data-game="invaders"><div class="icon">👾</div><h3>Invaders</h3><div class="desc">мышь+пробел</div><button class="btn">Играть</button></div>
     </div>
 
-    <!-- Сетка -->
-    <div id="game-grid" class="game-grid">
-        <!-- карточки игр (data-game) -->
-        <div class="game-card" data-game="invaders"><div class="icon">👾</div><h3>Space Invaders</h3><div class="desc">Стреляй по пришельцам</div><button class="play-btn">▶ Играть</button></div>
-        <div class="game-card" data-game="pacman"><div class="icon">🟡</div><h3>Pac-Man</h3><div class="desc">Собирай точки в лабиринте</div><button class="play-btn">▶ Играть</button></div>
-        <div class="game-card" data-game="dkong"><div class="icon">🦍</div><h3>Donkey Kong</h3><div class="desc">Прыгай по платформам</div><button class="play-btn">▶ Играть</button></div>
-        <div class="game-card" data-game="asteroids"><div class="icon">🚀</div><h3>Asteroids</h3><div class="desc">Уничтожай астероиды</div><button class="play-btn">▶ Играть</button></div>
-        <div class="game-card" data-game="breakout"><div class="icon">🧱</div><h3>Breakout</h3><div class="desc">Разбей все блоки</div><button class="play-btn">▶ Играть</button></div>
-        <div class="game-card" data-game="pole"><div class="icon">🏁</div><h3>Pole Position</h3><div class="desc">Гонка на скорость</div><button class="play-btn">▶ Играть</button></div>
-        <div class="game-card" data-game="snake"><div class="icon">🐍</div><h3>Snake</h3><div class="desc">Классическая змейка</div><button class="play-btn">▶ Играть</button></div>
-        <div class="game-card" data-game="dragon"><div class="icon">🧙</div><h3>Dragon Quest</h3><div class="desc">Текстовая RPG</div><button class="play-btn">▶ Играть</button></div>
-        <div class="game-card" data-game="tetris"><div class="icon">🧩</div><h3>Tetris</h3><div class="desc">Упрощённый тетрис</div><button class="play-btn">▶ Играть</button></div>
-        <div class="game-card" data-game="memory"><div class="icon">🃏</div><h3>Memory</h3><div class="desc">Найди пару карт</div><button class="play-btn">▶ Играть</button></div>
-        <div class="game-card" data-game="tictac"><div class="icon">❌⭕</div><h3>Tic-Tac-Toe</h3><div class="desc">Крестики-нолики</div><button class="play-btn">▶ Играть</button></div>
-        <div class="game-card" data-game="guess"><div class="icon">🔢</div><h3>Guess Number</h3><div class="desc">Угадай число 1–100</div><button class="play-btn">▶ Играть</button></div>
-    </div>
-
-    <!-- Контейнер игры -->
     <div id="game-container">
-        <canvas id="game-canvas" width="780" height="490"></canvas>
-        <div class="game-controls">
-            <span class="info" id="game-status">🎮 Игра загружена</span>
-            <button class="close-game" id="close-game">✕ Закрыть</button>
+        <canvas id="game-canvas" width="640" height="400"></canvas>
+        <div class="controls">
+            <span class="info" id="game-status">🎮</span>
+            <button class="close-btn" id="close-game">✕ Закрыть</button>
         </div>
     </div>
 
-    <div class="footer">
-        <span>⚡ 12 игр · HTML5 · без ретро</span>
-        <span>🖱️ мышь / ⌨️ клавиши</span>
-    </div>
+    <div class="footer"><span>6 игр</span><span>⌨️ / 🖱️</span></div>
 </div>
 
 <script>
-    // ================================================================
-    //  УПРАВЛЕНИЕ ИГРАМИ
-    // ================================================================
-    const grid = document.getElementById('game-grid');
-    const container = document.getElementById('game-container');
-    const canvas = document.getElementById('game-canvas');
-    const ctx = canvas.getContext('2d');
-    const statusEl = document.getElementById('game-status');
-    const closeBtn = document.getElementById('close-game');
+// ============================================================
+//  ОБЩЕЕ
+// ============================================================
+const grid = document.getElementById('game-grid');
+const container = document.getElementById('game-container');
+const canvas = document.getElementById('game-canvas');
+const ctx = canvas.getContext('2d');
+const statusEl = document.getElementById('game-status');
+const closeBtn = document.getElementById('close-game');
 
-    let currentGame = null;
-    let animId = null;
-    let gameRunning = false;
-    const W = 780, H = 490;
+let currentCleanup = null;
+let animId = null;
+let running = false;
+const W = 640, H = 400;
 
-    // ================================================================
-    //  ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ДЛЯ ИГР
-    // ================================================================
-    function stopCurrent() {
-        gameRunning = false;
-        if (currentGame && currentGame.cleanup) currentGame.cleanup();
-        if (animId) cancelAnimationFrame(animId);
+function stopGame() {
+    running = false;
+    if (animId) cancelAnimationFrame(animId);
+    if (currentCleanup) { currentCleanup(); currentCleanup = null; }
+}
+
+function startGame(name) {
+    stopGame();
+    container.classList.add('active');
+    grid.style.display = 'none';
+    running = true;
+    const fn = games[name];
+    if (fn) {
+        const res = fn();
+        currentCleanup = res.cleanup || null;
+        statusEl.textContent = '🎮 ' + name;
+    } else {
+        statusEl.textContent = '❌ ошибка';
+        running = false;
+    }
+}
+
+closeBtn.addEventListener('click', ()=>{
+    stopGame();
+    container.classList.remove('active');
+    grid.style.display = 'grid';
+    statusEl.textContent = '🎮';
+});
+
+document.querySelectorAll('.btn').forEach(b=>{
+    b.addEventListener('click', (e)=>{
+        const card = e.target.closest('.card');
+        startGame(card.dataset.game);
+    });
+});
+
+// ============================================================
+//  ИГРЫ (максимально лёгкие)
+// ============================================================
+
+// ----- SNAKE -----
+function gameSnake() {
+    const CELL = 18;
+    const cols = Math.floor(W/CELL), rows = Math.floor(H/CELL);
+    let snake = [{x:8,y:8}];
+    let food = {x:12,y:8};
+    let dir = {x:1,y:0}, nextDir = {x:1,y:0};
+    let score = 0, gameOver = false;
+
+    function onKey(e) {
+        const k = e.key;
+        if (k === 'ArrowUp' && dir.y===0) nextDir = {x:0,y:-1};
+        else if (k === 'ArrowDown' && dir.y===0) nextDir = {x:0,y:1};
+        else if (k === 'ArrowLeft' && dir.x===0) nextDir = {x:-1,y:0};
+        else if (k === 'ArrowRight' && dir.x===0) nextDir = {x:1,y:0};
+    }
+    window.addEventListener('keydown', onKey);
+
+    function spawnFood() {
+        food = {x: Math.floor(Math.random()*cols), y: Math.floor(Math.random()*rows)};
+    }
+    spawnFood();
+
+    function update() {
+        if (gameOver) return;
+        dir = {...nextDir};
+        let head = {...snake[0]};
+        head.x += dir.x; head.y += dir.y;
+        if (head.x < 0 || head.x >= cols || head.y < 0 || head.y >= rows) { gameOver = true; return; }
+        for (let s of snake) if (s.x===head.x && s.y===head.y) { gameOver = true; return; }
+        snake.unshift(head);
+        if (head.x===food.x && head.y===food.y) { score += 10; spawnFood(); }
+        else snake.pop();
     }
 
-    function startGame(name) {
-        stopCurrent();
-        container.classList.add('active');
-        grid.style.display = 'none';
+    function draw() {
+        ctx.fillStyle = '#fff'; ctx.fillRect(0,0,W,H);
+        ctx.fillStyle = '#28a745';
+        snake.forEach(s => ctx.fillRect(s.x*CELL+1, s.y*CELL+1, CELL-2, CELL-2));
+        ctx.fillStyle = '#dc3545';
+        ctx.fillRect(food.x*CELL+1, food.y*CELL+1, CELL-2, CELL-2);
+        ctx.fillStyle = '#212529';
+        ctx.font = '14px sans-serif';
+        ctx.fillText('🐍 '+score, 8, 20);
+        if (gameOver) { ctx.fillStyle = '#dc3545'; ctx.font = '24px sans-serif'; ctx.fillText('GAME OVER', W/2-70, H/2); }
+    }
 
-        gameRunning = true;
-        const gameFn = games[name];
-        if (gameFn) {
-            currentGame = gameFn();
-            statusEl.textContent = '🎮 ' + name.replace(/-/g,' ').toUpperCase();
+    function loop() { if (!running) return; update(); draw(); animId = requestAnimationFrame(loop); }
+    loop();
+    return { cleanup: ()=>{ window.removeEventListener('keydown', onKey); } };
+}
+
+// ----- BREAKOUT (мышь) -----
+function gameBreakout() {
+    let paddle = { x: W/2-40, y: H-30, w: 80, h: 10 };
+    let ball = { x: W/2, y: H-40, vx: 2.5, vy: -3.5, r: 6 };
+    let bricks = [];
+    let score = 0, lives = 3;
+    for (let r=0; r<4; r++) for (let c=0; c<9; c++)
+        bricks.push({ x: c*62+30, y: r*22+20, w: 52, h: 14, alive: true });
+
+    function onMouse(e) {
+        const rect = canvas.getBoundingClientRect();
+        const scale = canvas.width / rect.width;
+        paddle.x = (e.clientX - rect.left)*scale - paddle.w/2;
+        paddle.x = Math.max(0, Math.min(W-paddle.w, paddle.x));
+    }
+    canvas.addEventListener('mousemove', onMouse);
+
+    function update() {
+        ball.x += ball.vx; ball.y += ball.vy;
+        if (ball.x < 8 || ball.x > W-8) ball.vx *= -1;
+        if (ball.y < 8) ball.vy *= -1;
+        if (ball.y > H) { lives--; ball.x=W/2; ball.y=H-40; ball.vx=2.5; ball.vy=-3.5; if (lives<=0) running=false; }
+
+        if (ball.y+ball.r > paddle.y && ball.y-ball.r < paddle.y+paddle.h &&
+            ball.x > paddle.x && ball.x < paddle.x+paddle.w) {
+            ball.vy = -Math.abs(ball.vy);
+            ball.vx += (ball.x - (paddle.x+paddle.w/2))*0.1;
+            if (Math.abs(ball.vx)>5) ball.vx = Math.sign(ball.vx)*5;
+        }
+
+        bricks.forEach(b => {
+            if (!b.alive) return;
+            if (ball.x > b.x && ball.x < b.x+b.w && ball.y > b.y && ball.y < b.y+b.h) {
+                b.alive = false; score += 10; ball.vy *= -1;
+            }
+        });
+    }
+
+    function draw() {
+        ctx.fillStyle = '#fff'; ctx.fillRect(0,0,W,H);
+        ctx.fillStyle = '#0d6efd'; bricks.forEach(b => { if(b.alive) ctx.fillRect(b.x,b.y,b.w,b.h); });
+        ctx.fillStyle = '#0d6efd'; ctx.fillRect(paddle.x,paddle.y,paddle.w,paddle.h);
+        ctx.fillStyle = '#dc3545'; ctx.beginPath(); ctx.arc(ball.x,ball.y,ball.r,0,Math.PI*2); ctx.fill();
+        ctx.fillStyle = '#212529'; ctx.font='14px sans-serif'; ctx.fillText('🧱 '+score, 8,20); ctx.fillText('❤️ '.repeat(lives), W-70,20);
+    }
+
+    function loop() { if (!running) return; update(); draw(); animId = requestAnimationFrame(loop); }
+    loop();
+    return { cleanup: ()=>{ canvas.removeEventListener('mousemove', onMouse); } };
+}
+
+// ----- TIC-TAC-TOE -----
+function gameTictac() {
+    let board = Array(9).fill(null);
+    let turn = 'X';
+    let winner = null;
+    let scores = {X:0, O:0};
+
+    function check() {
+        const lines = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+        for (let l of lines) {
+            const [a,b,c] = l;
+            if (board[a] && board[a]===board[b] && board[a]===board[c]) return board[a];
+        }
+        if (board.every(v=>v)) return 'draw';
+        return null;
+    }
+
+    function onClick(e) {
+        if (winner) return;
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        const mx = (e.clientX - rect.left)*scaleX;
+        const my = (e.clientY - rect.top)*scaleY;
+        const cell = W/3;
+        const col = Math.floor(mx/cell), row = Math.floor(my/cell);
+        const idx = row*3 + col;
+        if (board[idx]) return;
+        board[idx] = turn;
+        const w = check();
+        if (w) {
+            if (w !== 'draw') scores[w]++;
+            winner = w;
         } else {
-            statusEl.textContent = '❌ Игра не найдена';
-            gameRunning = false;
+            turn = (turn === 'X') ? 'O' : 'X';
+        }
+    }
+    canvas.addEventListener('click', onClick);
+
+    function reset() { board.fill(null); turn='X'; winner=null; }
+
+    function draw() {
+        ctx.fillStyle='#fff'; ctx.fillRect(0,0,W,H);
+        const cell = W/3;
+        ctx.strokeStyle='#adb5bd'; ctx.lineWidth=2;
+        for (let i=1; i<3; i++) {
+            ctx.beginPath(); ctx.moveTo(i*cell,0); ctx.lineTo(i*cell,H); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(0,i*cell); ctx.lineTo(W,i*cell); ctx.stroke();
+        }
+        ctx.font='42px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+        for (let i=0;i<9;i++) {
+            const r=Math.floor(i/3), c=i%3;
+            ctx.fillStyle = board[i]==='X' ? '#0d6efd' : '#dc3545';
+            ctx.fillText(board[i]||'', c*cell+cell/2, r*cell+cell/2);
+        }
+        ctx.fillStyle='#212529'; ctx.font='14px sans-serif'; ctx.textAlign='left'; ctx.textBaseline='top';
+        ctx.fillText('X:'+scores.X+'  O:'+scores.O, 8,8);
+        if (winner) {
+            ctx.fillStyle='#198754'; ctx.font='20px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='bottom';
+            ctx.fillText(winner==='draw' ? 'Ничья!' : 'Победил '+winner, W/2, H-8);
+            setTimeout(reset, 1200);
         }
     }
 
-    // ================================================================
-    //  ИГРА 1: SPACE INVADERS (упрощённая)
-    // ================================================================
-    function gameInvaders() {
-        let player = { x: W/2, y: H-50, w: 40, h: 24 };
-        let bullets = [];
-        let enemies = [];
-        let score = 0, lives = 3, dir = 1, speed = 1.5, frame = 0;
-        let keys = {};
+    function loop() { if (!running) return; draw(); animId = requestAnimationFrame(loop); }
+    loop();
+    return { cleanup: ()=>{ canvas.removeEventListener('click', onClick); } };
+}
 
-        function initEnemies() {
-            enemies = [];
-            for (let r=0; r<4; r++) for (let c=0; c<8; c++)
-                enemies.push({ x: 60+c*70, y: 30+r*40, w: 36, h: 28, alive: true });
-        }
-        initEnemies();
+// ----- GUESS NUMBER -----
+function gameGuess() {
+    let target = Math.floor(Math.random()*100)+1;
+    let attempts = 0;
+    let msg = 'Введите число 1–100';
+    let input = '';
+    let over = false;
 
-        function onKey(e) {
-            keys[e.key] = true;
-            if (e.key === ' ' || e.key === 'Space') {
-                e.preventDefault();
-                if (bullets.length < 6) bullets.push({ x: player.x, y: player.y-18, w: 4, h: 14 });
+    function onKey(e) {
+        if (over) return;
+        if (e.key === 'Enter') {
+            const n = parseInt(input);
+            if (isNaN(n) || n<1 || n>100) { msg = '❌ от 1 до 100'; }
+            else {
+                attempts++;
+                if (n === target) { msg = '🎉 Угадал за '+attempts+'!'; over = true; }
+                else if (n < target) msg = '⬆️ Больше (попытка '+attempts+')';
+                else msg = '⬇️ Меньше (попытка '+attempts+')';
             }
-            if (e.key === 'ArrowLeft') player.x = Math.max(20, player.x-18);
-            if (e.key === 'ArrowRight') player.x = Math.min(W-20, player.x+18);
-        }
-        function onKeyUp(e) { keys[e.key] = false; }
-        window.addEventListener('keydown', onKey);
-        window.addEventListener('keyup', onKeyUp);
-
-        function update() {
-            frame++;
-            bullets.forEach(b => b.y -= 5);
-            bullets = bullets.filter(b => b.y > 0);
-
-            let edge = false;
-            enemies.forEach(e => {
-                if (!e.alive) return;
-                e.x += speed * dir;
-                if (e.x < 10 || e.x > W-40) edge = true;
-            });
-            if (edge) { dir *= -1; enemies.forEach(e => e.y += 6); speed += 0.08; }
-
-            bullets.forEach(b => {
-                enemies.forEach(e => {
-                    if (!e.alive) return;
-                    if (b.x > e.x && b.x < e.x+e.w && b.y > e.y && b.y < e.y+e.h) {
-                        e.alive = false; score += 10; b.dead = true;
-                    }
-                });
-            });
-            bullets = bullets.filter(b => !b.dead);
-
-            if (frame % 35 === 0) {
-                const alive = enemies.filter(e => e.alive && !e.isBullet);
-                if (alive.length) {
-                    const e = alive[Math.floor(Math.random()*alive.length)];
-                    enemies.push({ x: e.x+12, y: e.y+30, w: 8, h: 12, alive: true, isBullet: true });
-                }
-            }
-            enemies.forEach(e => { if (e.isBullet) e.y += 3; });
-            enemies = enemies.filter(e => !(e.isBullet && e.y > H));
-
-            enemies.forEach(e => {
-                if (!e.isBullet) return;
-                if (e.x > player.x-14 && e.x < player.x+14 && e.y > player.y-14 && e.y < player.y+14) {
-                    e.alive = false; lives--;
-                    if (lives <= 0) gameRunning = false;
-                }
-            });
-
-            if (enemies.filter(e => e.alive && !e.isBullet).length === 0) {
-                score += 50; initEnemies(); speed = 1.5;
-            }
-        }
-
-        function draw() {
-            ctx.fillStyle = '#f0f2f5';
-            ctx.fillRect(0,0,W,H);
-
-            ctx.fillStyle = '#0984e3';
-            ctx.fillRect(player.x-20, player.y-12, 40, 24);
-            ctx.fillStyle = '#74b9ff';
-            ctx.fillRect(player.x-12, player.y-22, 24, 10);
-
-            ctx.fillStyle = '#e17055';
-            bullets.forEach(b => ctx.fillRect(b.x-2, b.y-7, 4, 14));
-
-            enemies.forEach(e => {
-                if (!e.alive) return;
-                if (e.isBullet) {
-                    ctx.fillStyle = '#d63031';
-                    ctx.fillRect(e.x-4, e.y-6, 8, 12);
-                } else {
-                    ctx.fillStyle = '#00b894';
-                    ctx.fillRect(e.x, e.y, e.w, e.h);
-                    ctx.fillStyle = '#81ecec';
-                    ctx.fillRect(e.x+6, e.y-6, 8, 6);
-                    ctx.fillRect(e.x+20, e.y-6, 8, 6);
-                }
-            });
-
-            ctx.fillStyle = '#2d3436';
-            ctx.font = '18px sans-serif';
-            ctx.fillText('🏆 '+score, 14, 34);
-            ctx.fillText('❤️ '.repeat(lives), W-100, 34);
-            if (lives <= 0) {
-                ctx.fillStyle = '#d63031';
-                ctx.font = '36px sans-serif';
-                ctx.fillText('GAME OVER', W/2-100, H/2);
-            }
-        }
-
-        function loop() {
-            if (!gameRunning) return;
-            update(); draw();
-            animId = requestAnimationFrame(loop);
-        }
-        function cleanup() {
-            window.removeEventListener('keydown', onKey);
-            window.removeEventListener('keyup', onKeyUp);
-        }
-        loop();
-        return { cleanup };
-    }
-
-    // ================================================================
-    //  ИГРА 2: PAC-MAN (упрощённый)
-    // ================================================================
-    function gamePacman() {
-        let pac = { x: 380, y: 350, dir: 0, speed: 2.5 };
-        let dots = [], walls = [];
-        let score = 0, lives = 3;
-        let keys = {};
-
-        for (let i=0; i<14; i++) for (let j=0; j<9; j++) {
-            if ((i%3===0 && j%2===0) || (i%2===0 && j%3===0))
-                walls.push({ x: i*52+30, y: j*52+30, w: 24, h: 24 });
-        }
-        for (let i=0; i<14; i++) for (let j=0; j<9; j++) {
-            let cx = i*52+50, cy = j*52+50;
-            let blocked = walls.some(w => cx>w.x && cx<w.x+w.w && cy>w.y && cy<w.y+w.h);
-            if (!blocked) dots.push({ x: cx, y: cy, r: 5, eaten: false });
-        }
-
-        function onKey(e) {
-            keys[e.key] = true;
-            if (e.key==='ArrowUp') pac.dir=0;
-            if (e.key==='ArrowDown') pac.dir=1;
-            if (e.key==='ArrowLeft') pac.dir=2;
-            if (e.key==='ArrowRight') pac.dir=3;
-        }
-        function onKeyUp(e) { keys[e.key]=false; }
-        window.addEventListener('keydown', onKey);
-        window.addEventListener('keyup', onKeyUp);
-
-        function update() {
-            let dx=0,dy=0;
-            if (pac.dir===0) dy=-pac.speed;
-            if (pac.dir===1) dy=pac.speed;
-            if (pac.dir===2) dx=-pac.speed;
-            if (pac.dir===3) dx=pac.speed;
-            let nx=pac.x+dx, ny=pac.y+dy;
-            let blocked = walls.some(w => nx>w.x-10 && nx<w.x+w.w+10 && ny>w.y-10 && ny<w.y+w.h+10);
-            if (!blocked) { pac.x=nx; pac.y=ny; }
-            pac.x=Math.max(20, Math.min(W-20, pac.x));
-            pac.y=Math.max(20, Math.min(H-20, pac.y));
-
-            dots.forEach(d => {
-                if (!d.eaten && Math.hypot(pac.x-d.x, pac.y-d.y) < 14) {
-                    d.eaten = true; score += 10;
-                }
-            });
-        }
-
-        function draw() {
-            ctx.fillStyle = '#f0f2f5';
-            ctx.fillRect(0,0,W,H);
-            ctx.fillStyle = '#b2bec3';
-            walls.forEach(w => ctx.fillRect(w.x, w.y, w.w, w.h));
-            ctx.fillStyle = '#fdcb6e';
-            dots.forEach(d => { if(!d.eaten) { ctx.beginPath(); ctx.arc(d.x,d.y,d.r,0,Math.PI*2); ctx.fill(); } });
-            ctx.fillStyle = '#e17055';
-            ctx.beginPath(); ctx.arc(pac.x, pac.y, 18, 0.2, Math.PI*1.8); ctx.lineTo(pac.x, pac.y); ctx.fill();
-            ctx.fillStyle = '#2d3436';
-            ctx.font='18px sans-serif';
-            ctx.fillText('🏆 '+score, 14, 34);
-        }
-
-        function loop() {
-            if (!gameRunning) return;
-            update(); draw();
-            animId = requestAnimationFrame(loop);
-        }
-        function cleanup() {
-            window.removeEventListener('keydown', onKey);
-            window.removeEventListener('keyup', onKeyUp);
-        }
-        loop();
-        return { cleanup };
-    }
-
-    // ================================================================
-    //  ИГРА 3: DONKEY KONG (прыжки)
-    // ================================================================
-    function gameDkong() {
-        let player = { x: 120, y: 390, vy: 0, w: 24, h: 30 };
-        let platforms = [
-            {x:40,y:400,w:140,h:12},{x:230,y:340,w:110,h:12},
-            {x:380,y:280,w:110,h:12},{x:540,y:220,w:110,h:12},
-            {x:60,y:160,w:130,h:12},{x:240,y:100,w:120,h:12}
-        ];
-        let barrels = [], score=0, lives=3, onGround=false, keys={};
-
-        function onKey(e) { keys[e.key]=true; }
-        function onKeyUp(e) { keys[e.key]=false; }
-        window.addEventListener('keydown', onKey);
-        window.addEventListener('keyup', onKeyUp);
-
-        function update() {
-            if (keys['ArrowLeft']) player.x -= 3.5;
-            if (keys['ArrowRight']) player.x += 3.5;
-            if (keys['ArrowUp'] && onGround) { player.vy = -8.5; onGround = false; }
-
-            player.vy += 0.45;
-            player.y += player.vy;
-            onGround = false;
-            platforms.forEach(p => {
-                if (player.x+player.w>p.x && player.x<p.x+p.w &&
-                    player.y+player.h>p.y && player.y+player.h<p.y+p.h+12 && player.vy>0) {
-                    player.y = p.y - player.h;
-                    player.vy = 0;
-                    onGround = true;
-                }
-            });
-
-            if (Math.random() < 0.025) barrels.push({ x: 30, y: 20, vy: 2, vx: 1.8 });
-            barrels.forEach(b => { b.x += b.vx; b.y += b.vy; if (b.x>W-30) b.vx*=-1; if(b.x<10) b.vx*=-1; });
-            barrels = barrels.filter(b => b.y < H);
-
-            barrels.forEach(b => {
-                if (Math.hypot(player.x-b.x, player.y-b.y) < 28) {
-                    lives--; player.x=120; player.y=390; barrels=[];
-                    if (lives<=0) gameRunning=false;
-                }
-            });
-            if (player.y < 20) { score += 100; player.x=120; player.y=390; }
-            player.x = Math.max(10, Math.min(W-30, player.x));
-        }
-
-        function draw() {
-            ctx.fillStyle='#f0f2f5'; ctx.fillRect(0,0,W,H);
-            ctx.fillStyle='#6c5ce7'; platforms.forEach(p => ctx.fillRect(p.x,p.y,p.w,p.h));
-            ctx.fillStyle='#e17055'; barrels.forEach(b => { ctx.beginPath(); ctx.arc(b.x,b.y,14,0,Math.PI*2); ctx.fill(); });
-            ctx.fillStyle='#00b894'; ctx.fillRect(player.x,player.y,player.w,player.h);
-            ctx.fillStyle='#0984e3'; ctx.fillRect(player.x+4, player.y-8, 16, 8);
-            ctx.fillStyle='#2d3436'; ctx.font='18px sans-serif';
-            ctx.fillText('🏆 '+score, 14, 34);
-            ctx.fillText('❤️ '.repeat(lives), W-100, 34);
-        }
-
-        function loop() {
-            if (!gameRunning) return;
-            update(); draw();
-            animId = requestAnimationFrame(loop);
-        }
-        function cleanup() {
-            window.removeEventListener('keydown', onKey);
-            window.removeEventListener('keyup', onKeyUp);
-        }
-        loop();
-        return { cleanup };
-    }
-
-    // ================================================================
-    //  ИГРА 4: ASTEROIDS
-    // ================================================================
-    function gameAsteroids() {
-        let ship = { x: W/2, y: H/2, angle: 0, vx: 0, vy: 0 };
-        let bullets = [], asteroids = [];
-        let score = 0, lives = 3, keys = {};
-
-        for (let i=0; i<7; i++) asteroids.push({
-            x: Math.random()*W, y: Math.random()*H,
-            r: 28+Math.random()*24, vx: (Math.random()-0.5)*2.5, vy: (Math.random()-0.5)*2.5
-        });
-
-        function onKey(e) {
-            keys[e.key]=true;
-            if (e.key===' ') { e.preventDefault(); bullets.push({ x: ship.x, y: ship.y, vx: Math.cos(ship.angle)*7, vy: Math.sin(ship.angle)*7 }); }
-        }
-        function onKeyUp(e) { keys[e.key]=false; }
-        window.addEventListener('keydown', onKey);
-        window.addEventListener('keyup', onKeyUp);
-
-        function update() {
-            if (keys['ArrowLeft']) ship.angle -= 0.055;
-            if (keys['ArrowRight']) ship.angle += 0.055;
-            if (keys['ArrowUp']) { ship.vx += Math.cos(ship.angle)*0.1; ship.vy += Math.sin(ship.angle)*0.1; }
-
-            ship.x += ship.vx; ship.y += ship.vy;
-            if (ship.x<0) ship.x=W; if (ship.x>W) ship.x=0;
-            if (ship.y<0) ship.y=H; if (ship.y>H) ship.y=0;
-            ship.vx *= 0.99; ship.vy *= 0.99;
-
-            bullets.forEach(b => { b.x+=b.vx; b.y+=b.vy; });
-            bullets = bullets.filter(b => b.x>0 && b.x<W && b.y>0 && b.y<H);
-
-            asteroids.forEach(a => { a.x+=a.vx; a.y+=a.vy; if(a.x<0)a.x=W; if(a.x>W)a.x=0; if(a.y<0)a.y=H; if(a.y>H)a.y=0; });
-
-            bullets.forEach(b => {
-                asteroids.forEach(a => {
-                    if (Math.hypot(b.x-a.x, b.y-a.y) < a.r) {
-                        a.r = 0; score += 20;
-                        if (a.r > 18) {
-                            asteroids.push({x:a.x+12,y:a.y+12,r:a.r/2,vx:(Math.random()-0.5)*3.5,vy:(Math.random()-0.5)*3.5});
-                            asteroids.push({x:a.x-12,y:a.y-12,r:a.r/2,vx:(Math.random()-0.5)*3.5,vy:(Math.random()-0.5)*3.5});
-                        }
-                    }
-                });
-            });
-            asteroids = asteroids.filter(a => a.r > 4);
-
-            asteroids.forEach(a => {
-                if (Math.hypot(ship.x-a.x, ship.y-a.y) < a.r+14) {
-                    lives--; ship.x=W/2; ship.y=H/2; ship.vx=0; ship.vy=0;
-                    if (lives<=0) gameRunning=false;
-                }
-            });
-        }
-
-        function draw() {
-            ctx.fillStyle='#f0f2f5'; ctx.fillRect(0,0,W,H);
-            ctx.strokeStyle='#2d3436'; ctx.lineWidth=2;
-            asteroids.forEach(a => { ctx.beginPath(); ctx.arc(a.x,a.y,a.r,0,Math.PI*2); ctx.stroke(); });
-            ctx.fillStyle='#0984e3';
-            ctx.beginPath();
-            ctx.moveTo(ship.x+Math.cos(ship.angle)*24, ship.y+Math.sin(ship.angle)*24);
-            ctx.lineTo(ship.x+Math.cos(ship.angle+2.3)*16, ship.y+Math.sin(ship.angle+2.3)*16);
-            ctx.lineTo(ship.x+Math.cos(ship.angle-2.3)*16, ship.y+Math.sin(ship.angle-2.3)*16);
-            ctx.fill();
-            ctx.fillStyle='#e17055';
-            bullets.forEach(b => { ctx.beginPath(); ctx.arc(b.x,b.y,4,0,Math.PI*2); ctx.fill(); });
-            ctx.fillStyle='#2d3436';
-            ctx.font='18px sans-serif';
-            ctx.fillText('🏆 '+score, 14, 34);
-            ctx.fillText('❤️ '.repeat(lives), W-100, 34);
-        }
-
-        function loop() {
-            if (!gameRunning) return;
-            update(); draw();
-            animId = requestAnimationFrame(loop);
-        }
-        function cleanup() {
-            window.removeEventListener('keydown', onKey);
-            window.removeEventListener('keyup', onKeyUp);
-        }
-        loop();
-        return { cleanup };
-    }
-
-    // ================================================================
-    //  ИГРА 5: BREAKOUT
-    // ================================================================
-    function gameBreakout() {
-        let paddle = { x: W/2-50, y: H-34, w: 100, h: 14 };
-        let ball = { x: W/2, y: H-56, vx: 3.5, vy: -4.5, r: 8 };
-        let bricks = [], score=0, lives=3;
-        for (let r=0; r<5; r++) for (let c=0; c<11; c++)
-            bricks.push({ x: c*65+30, y: r*28+30, w: 55, h: 18, alive: true });
-
-        function onMouse(e) {
-            const rect = canvas.getBoundingClientRect();
-            const scaleX = canvas.width / rect.width;
-            paddle.x = (e.clientX - rect.left) * scaleX - paddle.w/2;
-            paddle.x = Math.max(0, Math.min(W-paddle.w, paddle.x));
-        }
-        canvas.addEventListener('mousemove', onMouse);
-
-        function update() {
-            ball.x += ball.vx; ball.y += ball.vy;
-            if (ball.x<10 || ball.x>W-10) ball.vx *= -1;
-            if (ball.y<10) ball.vy *= -1;
-            if (ball.y>H) { lives--; ball.x=W/2; ball.y=H-56; ball.vx=3.5; ball.vy=-4.5; if(lives<=0) gameRunning=false; }
-
-            if (ball.y+ball.r > paddle.y && ball.y-ball.r < paddle.y+paddle.h &&
-                ball.x > paddle.x && ball.x < paddle.x+paddle.w) {
-                ball.vy = -Math.abs(ball.vy);
-                ball.vx += (ball.x - (paddle.x+paddle.w/2)) * 0.12;
-                if (Math.abs(ball.vx) > 7) ball.vx = Math.sign(ball.vx)*7;
-            }
-
-            bricks.forEach(b => {
-                if (!b.alive) return;
-                if (ball.x > b.x && ball.x < b.x+b.w && ball.y > b.y && ball.y < b.y+b.h) {
-                    b.alive = false; score += 10; ball.vy *= -1;
-                }
-            });
-        }
-
-        function draw() {
-            ctx.fillStyle='#f0f2f5'; ctx.fillRect(0,0,W,H);
-            ctx.fillStyle='#6c5ce7'; bricks.forEach(b => { if(b.alive) ctx.fillRect(b.x,b.y,b.w,b.h); });
-            ctx.fillStyle='#0984e3'; ctx.fillRect(paddle.x,paddle.y,paddle.w,paddle.h);
-            ctx.fillStyle='#e17055'; ctx.beginPath(); ctx.arc(ball.x,ball.y,ball.r,0,Math.PI*2); ctx.fill();
-            ctx.fillStyle='#2d3436'; ctx.font='18px sans-serif';
-            ctx.fillText('🏆 '+score, 14, 34);
-            ctx.fillText('❤️ '.repeat(lives), W-100, 34);
-        }
-
-        function loop() {
-            if (!gameRunning) return;
-            update(); draw();
-            animId = requestAnimationFrame(loop);
-        }
-        function cleanup() { canvas.removeEventListener('mousemove', onMouse); }
-        loop();
-        return { cleanup };
-    }
-
-    // ================================================================
-    //  ИГРА 6: POLE POSITION (гонка)
-    // ================================================================
-    function gamePole() {
-        let player = { x: W/2, y: H-70, w: 36, h: 48 };
-        let obstacles = [], score = 0, speed = 3.5, keys = {};
-
-        function onKey(e) { keys[e.key]=true; }
-        function onKeyUp(e) { keys[e.key]=false; }
-        window.addEventListener('keydown', onKey);
-        window.addEventListener('keyup', onKeyUp);
-
-        function update() {
-            if (keys['ArrowLeft']) player.x -= 6;
-            if (keys['ArrowRight']) player.x += 6;
-            player.x = Math.max(24, Math.min(W-24, player.x));
-
-            if (Math.random() < 0.045) obstacles.push({ x: 40+Math.random()*(W-80), y: 0, w: 30+Math.random()*40, h: 22 });
-            obstacles.forEach(o => o.y += speed);
-            obstacles = obstacles.filter(o => o.y < H);
-
-            obstacles.forEach(o => {
-                if (player.x > o.x-20 && player.x < o.x+o.w+20 && player.y > o.y-20 && player.y < o.y+o.h+20) {
-                    score = Math.max(0, score-40);
-                }
-            });
-            score += 1;
-        }
-
-        function draw() {
-            ctx.fillStyle='#dfe6e9'; ctx.fillRect(0,0,W,H);
-            ctx.fillStyle='#b2bec3';
-            for (let i=0; i<H; i+=30) ctx.fillRect(W/2-6, (i+score*0.5)%H, 12, 18);
-            ctx.fillStyle='#d63031';
-            obstacles.forEach(o => ctx.fillRect(o.x, o.y, o.w, o.h));
-            ctx.fillStyle='#0984e3';
-            ctx.fillRect(player.x-18, player.y-24, 36, 48);
-            ctx.fillStyle='#2d3436';
-            ctx.font='18px sans-serif';
-            ctx.fillText('🏁 '+Math.floor(score/8), 14, 34);
-        }
-
-        function loop() {
-            if (!gameRunning) return;
-            update(); draw();
-            animId = requestAnimationFrame(loop);
-        }
-        function cleanup() {
-            window.removeEventListener('keydown', onKey);
-            window.removeEventListener('keyup', onKeyUp);
-        }
-        loop();
-        return { cleanup };
-    }
-
-    // ================================================================
-    //  ИГРА 7: SNAKE
-    // ================================================================
-    function gameSnake() {
-        const CELL=20;
-        let snake = [{x:12,y:12}];
-        let food = {x:20,y:12};
-        let dir = {x:1,y:0}, nextDir={x:1,y:0};
-        let score=0, gameOver=false, keys={};
-
-        function onKey(e) {
-            keys[e.key]=true;
-            if (e.key==='ArrowUp' && dir.y===0) nextDir={x:0,y:-1};
-            if (e.key==='ArrowDown' && dir.y===0) nextDir={x:0,y:1};
-            if (e.key==='ArrowLeft' && dir.x===0) nextDir={x:-1,y:0};
-            if (e.key==='ArrowRight' && dir.x===0) nextDir={x:1,y:0};
-        }
-        window.addEventListener('keydown', onKey);
-
-        function spawnFood() {
-            food = {x: Math.floor(Math.random()*(W/CELL)), y: Math.floor(Math.random()*(H/CELL))};
-        }
-        spawnFood();
-
-        function update() {
-            if (gameOver) return;
-            dir = {...nextDir};
-            let head = {...snake[0]};
-            head.x += dir.x; head.y += dir.y;
-
-            if (head.x<0 || head.x>=W/CELL || head.y<0 || head.y>=H/CELL) { gameOver=true; return; }
-            for (let s of snake) if (s.x===head.x && s.y===head.y) { gameOver=true; return; }
-
-            snake.unshift(head);
-            if (head.x===food.x && head.y===food.y) {
-                score += 10;
-                spawnFood();
-            } else {
-                snake.pop();
-            }
-        }
-
-        function draw() {
-            ctx.fillStyle='#f0f2f5'; ctx.fillRect(0,0,W,H);
-            ctx.fillStyle='#00b894';
-            snake.forEach(s => ctx.fillRect(s.x*CELL+1, s.y*CELL+1, CELL-2, CELL-2));
-            ctx.fillStyle='#e17055';
-            ctx.fillRect(food.x*CELL+1, food.y*CELL+1, CELL-2, CELL-2);
-            ctx.fillStyle='#2d3436';
-            ctx.font='18px sans-serif';
-            ctx.fillText('🐍 '+score, 14, 34);
-            if (gameOver) {
-                ctx.fillStyle='#d63031';
-                ctx.font='30px sans-serif';
-                ctx.fillText('GAME OVER', W/2-90, H/2);
-            }
-        }
-
-        function loop() {
-            if (!gameRunning) return;
-            update(); draw();
-            animId = requestAnimationFrame(loop);
-        }
-        function cleanup() { window.removeEventListener('keydown', onKey); }
-        loop();
-        return { cleanup };
-    }
-
-    // ================================================================
-    //  ИГРА 8: DRAGON QUEST (текстовая RPG)
-    // ================================================================
-    function gameDragon() {
-        let hp=25, maxHp=25, gold=0, monsterHp=0, state='start', log='Добро пожаловать!';
-        let btns = [];
-
-        function setLog(msg) { log = msg; }
-
-        function fight() {
-            monsterHp = 12 + Math.floor(Math.random()*18);
-            state = 'fight';
-            setLog('⚔️ Монстр! HP: '+monsterHp);
-        }
-        function attack() {
-            if (state!=='fight') return;
-            let dmg = 4+Math.floor(Math.random()*7);
-            monsterHp -= dmg;
-            setLog('💥 Урон '+dmg+' (осталось '+monsterHp+')');
-            if (monsterHp <= 0) {
-                gold += 12+Math.floor(Math.random()*12);
-                setLog('🏆 Победа! +'+gold+' золота');
-                state='start';
-                return;
-            }
-            let enemyDmg = 2+Math.floor(Math.random()*5);
-            hp -= enemyDmg;
-            if (hp <= 0) { hp=0; setLog('💀 Ты погиб...'); state='dead'; }
-            else setLog('❤️ '+hp+'/'+maxHp+' HP');
-        }
-        function heal() {
-            if (gold >= 12) {
-                gold -= 12;
-                hp = Math.min(maxHp, hp+12);
-                setLog('💚 Восстановлено! HP: '+hp);
-            } else setLog('❌ Нужно 12 золота');
-        }
-        function resetGame() {
-            hp=maxHp; gold=0; state='start';
-            setLog('Новое приключение!');
-        }
-
-        btns = [
-            { label: '⚔️ Сражаться', x:50, y:200, action: fight },
-            { label: '💚 Лечить (12🪙)', x:240, y:200, action: heal },
-            { label: '🔄 Перезапуск', x:470, y:200, action: resetGame },
-        ];
-
-        function draw() {
-            ctx.fillStyle='#f0f2f5'; ctx.fillRect(0,0,W,H);
-            ctx.fillStyle='#2d3436'; ctx.font='22px sans-serif';
-            ctx.fillText('🧙 Dragon Quest', 30, 50);
-            ctx.font='18px sans-serif';
-            ctx.fillText('❤️ '+hp+'/'+maxHp+'   🪙 '+gold, 30, 90);
-            ctx.fillText('📜 '+log, 30, 140);
-
-            btns.forEach(b => {
-                ctx.fillStyle='#dfe6e9';
-                ctx.shadowColor='rgba(0,0,0,0.04)';
-                ctx.shadowBlur=8;
-                ctx.fillRect(b.x, b.y, 180, 48);
-                ctx.shadowBlur=0;
-                ctx.fillStyle='#2d3436';
-                ctx.font='17px sans-serif';
-                ctx.fillText(b.label, b.x+12, b.y+32);
-                b.rect = {x:b.x, y:b.y, w:180, h:48};
-            });
-            window._rpgBtns = btns;
-        }
-
-        function onCanvasClick(e) {
-            const rect = canvas.getBoundingClientRect();
-            const scaleX = canvas.width / rect.width;
-            const scaleY = canvas.height / rect.height;
-            const mx = (e.clientX - rect.left) * scaleX;
-            const my = (e.clientY - rect.top) * scaleY;
-            if (window._rpgBtns) {
-                for (let b of window._rpgBtns) {
-                    if (mx > b.rect.x && mx < b.rect.x+b.rect.w &&
-                        my > b.rect.y && my < b.rect.y+b.rect.h) {
-                        b.action();
-                        return;
-                    }
-                }
-            }
-        }
-        canvas.addEventListener('click', onCanvasClick);
-
-        function loop() {
-            if (!gameRunning) return;
-            draw();
-            animId = requestAnimationFrame(loop);
-        }
-        function cleanup() {
-            canvas.removeEventListener('click', onCanvasClick);
-            window._rpgBtns = null;
-        }
-        loop();
-        return { cleanup };
-    }
-
-    // ================================================================
-    //  ИГРА 9: TETRIS (упрощённый)
-    // ================================================================
-    function gameTetris() {
-        const COLS=10, ROWS=20, SIZE=24;
-        let board = Array.from({length:ROWS}, ()=>Array(COLS).fill(0));
-        let piece = null;
-        let score=0, gameOver=false;
-        let dropCounter=0, dropInterval=500, lastTime=0;
-        let keys={};
-
-        const PIECES = [
-            [[1,1,1,1]],
-            [[1,1],[1,1]],
-            [[0,1,0],[1,1,1]],
-            [[1,0,0],[1,1,1]],
-            [[0,0,1],[1,1,1]],
-            [[0,1,1],[1,1,0]],
-            [[1,1,0],[0,1,1]],
-        ];
-
-        function newPiece() {
-            const type = PIECES[Math.floor(Math.random()*PIECES.length)];
-            piece = {
-                matrix: type,
-                x: Math.floor((COLS - type[0].length)/2),
-                y: 0,
-            };
-            if (collision(piece.matrix, piece.x, piece.y)) {
-                gameOver = true;
-                piece = null;
-            }
-        }
-
-        function collision(matrix, offX, offY) {
-            for (let r=0; r<matrix.length; r++) {
-                for (let c=0; c<matrix[0].length; c++) {
-                    if (matrix[r][c] !== 0) {
-                        const x = offX + c;
-                        const y = offY + r;
-                        if (x < 0 || x >= COLS || y >= ROWS || y < 0) return true;
-                        if (y >= 0 && board[y][x] !== 0) return true;
-                    }
-                }
-            }
-            return false;
-        }
-
-        function merge() {
-            if (!piece) return;
-            for (let r=0; r<piece.matrix.length; r++) {
-                for (let c=0; c<piece.matrix[0].length; c++) {
-                    if (piece.matrix[r][c] !== 0) {
-                        const y = piece.y + r;
-                        const x = piece.x + c;
-                        if (y >= 0) board[y][x] = piece.matrix[r][c];
-                    }
-                }
-            }
-            // убрать полные линии
-            for (let row=ROWS-1; row>=0; ) {
-                if (board[row].every(cell => cell !== 0)) {
-                    board.splice(row, 1);
-                    board.unshift(Array(COLS).fill(0));
-                    score += 100;
-                } else row--;
-            }
-            newPiece();
-        }
-
-        function move(dir) {
-            if (!piece || gameOver) return;
-            const newX = piece.x + dir;
-            if (!collision(piece.matrix, newX, piece.y)) {
-                piece.x = newX;
-            }
-        }
-
-        function rotate() {
-            if (!piece || gameOver) return;
-            const rotated = piece.matrix[0].map((_, i) => piece.matrix.map(row => row[i]).reverse());
-            if (!collision(rotated, piece.x, piece.y)) {
-                piece.matrix = rotated;
-            }
-        }
-
-        function drop() {
-            if (!piece || gameOver) return;
-            if (!collision(piece.matrix, piece.x, piece.y+1)) {
-                piece.y++;
-            } else {
-                merge();
-            }
-        }
-
-        function onKey(e) {
-            keys[e.key]=true;
-            if (e.key==='ArrowLeft') move(-1);
-            if (e.key==='ArrowRight') move(1);
-            if (e.key==='ArrowDown') drop();
-            if (e.key==='ArrowUp') rotate();
-            if (e.key===' ') { e.preventDefault(); while(!collision(piece.matrix, piece.x, piece.y+1)) piece.y++; merge(); }
-        }
-        function onKeyUp(e) { keys[e.key]=false; }
-        window.addEventListener('keydown', onKey);
-        window.addEventListener('keyup', onKeyUp);
-
-        newPiece();
-
-        function update(time) {
-            if (gameOver || !piece) return;
-            const delta = time - lastTime;
-            lastTime = time;
-            dropCounter += delta;
-            if (dropCounter > dropInterval) {
-                drop();
-                dropCounter = 0;
-            }
-        }
-
-        function draw() {
-            ctx.fillStyle='#f0f2f5'; ctx.fillRect(0,0,W,H);
-            const offsetX = (W - COLS*SIZE)/2;
-            const offsetY = (H - ROWS*SIZE)/2;
-
-            for (let r=0; r<ROWS; r++) {
-                for (let c=0; c<COLS; c++) {
-                    if (board[r][c] !== 0) {
-                        ctx.fillStyle = '#0984e3';
-                        ctx.fillRect(offsetX + c*SIZE, offsetY + r*SIZE, SIZE-1, SIZE-1);
-                    }
-                }
-            }
-            if (piece) {
-                ctx.fillStyle = '#e17055';
-                for (let r=0; r<piece.matrix.length; r++) {
-                    for (let c=0; c<piece.matrix[0].length; c++) {
-                        if (piece.matrix[r][c] !== 0) {
-                            const x = offsetX + (piece.x + c)*SIZE;
-                            const y = offsetY + (piece.y + r)*SIZE;
-                            ctx.fillRect(x, y, SIZE-1, SIZE-1);
-                        }
-                    }
-                }
-            }
-            ctx.fillStyle='#2d3436'; ctx.font='18px sans-serif';
-            ctx.fillText('🧩 '+score, 14, 34);
-            if (gameOver) {
-                ctx.fillStyle='#d63031'; ctx.font='30px sans-serif';
-                ctx.fillText('GAME OVER', W/2-90, H/2);
-            }
-        }
-
-        function loop(time) {
-            if (!gameRunning) return;
-            update(time);
-            draw();
-            animId = requestAnimationFrame(loop);
-        }
-        function cleanup() {
-            window.removeEventListener('keydown', onKey);
-            window.removeEventListener('keyup', onKeyUp);
-        }
-        animId = requestAnimationFrame(loop);
-        return { cleanup };
-    }
-
-    // ================================================================
-    //  ИГРА 10: MEMORY (найди пару)
-    // ================================================================
-    function gameMemory() {
-        const EMOJIS = ['🍎','🍌','🍒','🍇','🍉','🍓','🍑','🍊','🍋','🍍','🥝','🍈'];
-        let cards = [];
-        let flipped = [];
-        let matched = [];
-        let score = 0;
-        let locked = false;
-
-        function shuffle(arr) {
-            for (let i=arr.length-1; i>0; i--) {
-                const j = Math.floor(Math.random()*(i+1));
-                [arr[i], arr[j]] = [arr[j], arr[i]];
-            }
-            return arr;
-        }
-
-        function init() {
-            const deck = [...EMOJIS, ...EMOJIS];
-            shuffle(deck);
-            cards = deck.map((emoji, index) => ({ id: index, emoji, flipped: false, matched: false }));
-            flipped = [];
-            matched = [];
-            score = 0;
-            locked = false;
-        }
-        init();
-
-        function onCanvasClick(e) {
-            if (locked) return;
-            const rect = canvas.getBoundingClientRect();
-            const scaleX = canvas.width / rect.width;
-            const scaleY = canvas.height / rect.height;
-            const mx = (e.clientX - rect.left) * scaleX;
-            const my = (e.clientY - rect.top) * scaleY;
-
-            const cols = 6, rows = 4;
-            const cw = W/cols, ch = H/rows;
-            const col = Math.floor(mx / cw);
-            const row = Math.floor(my / ch);
-            const idx = row*cols + col;
-            if (idx >= cards.length) return;
-            const card = cards[idx];
-            if (card.flipped || card.matched) return;
-
-            // flip
-            card.flipped = true;
-            flipped.push(card);
-
-            if (flipped.length === 2) {
-                locked = true;
-                if (flipped[0].emoji === flipped[1].emoji) {
-                    flipped[0].matched = true;
-                    flipped[1].matched = true;
-                    score += 10;
-                    flipped = [];
-                    locked = false;
-                    if (cards.every(c => c.matched)) {
-                        // победа
-                        setTimeout(() => { alert('🏆 Вы выиграли! Счёт: '+score); }, 100);
-                    }
-                } else {
-                    setTimeout(() => {
-                        flipped[0].flipped = false;
-                        flipped[1].flipped = false;
-                        flipped = [];
-                        locked = false;
-                    }, 600);
-                }
-            }
-        }
-        canvas.addEventListener('click', onCanvasClick);
-
-        function draw() {
-            ctx.fillStyle='#f0f2f5'; ctx.fillRect(0,0,W,H);
-            const cols=6, rows=4;
-            const cw=W/cols, ch=H/rows;
-            for (let i=0; i<cards.length; i++) {
-                const row = Math.floor(i/cols);
-                const col = i%cols;
-                const x = col*cw, y = row*ch;
-                const card = cards[i];
-                ctx.fillStyle = card.matched ? '#b2bec3' : (card.flipped ? '#dfe6e9' : '#0984e3');
-                ctx.fillRect(x+4, y+4, cw-8, ch-8);
-                ctx.fillStyle='#2d3436';
-                ctx.font='28px sans-serif';
-                ctx.textAlign='center';
-                ctx.textBaseline='middle';
-                if (card.flipped || card.matched) {
-                    ctx.fillText(card.emoji, x+cw/2, y+ch/2);
-                }
-            }
-            ctx.fillStyle='#2d3436';
-            ctx.font='18px sans-serif';
-            ctx.textAlign='left';
-            ctx.textBaseline='top';
-            ctx.fillText('🃏 '+score, 14, 14);
-        }
-
-        function loop() {
-            if (!gameRunning) return;
-            draw();
-            animId = requestAnimationFrame(loop);
-        }
-        function cleanup() { canvas.removeEventListener('click', onCanvasClick); }
-        loop();
-        return { cleanup };
-    }
-
-    // ================================================================
-    //  ИГРА 11: TIC-TAC-TOE (крестики-нолики)
-    // ================================================================
-    function gameTictac() {
-        let board = Array(9).fill(null);
-        let turn = 'X';
-        let winner = null;
-        let scoreX = 0, scoreO = 0;
-
-        function checkWinner() {
-            const lines = [
-                [0,1,2],[3,4,5],[6,7,8],
-                [0,3,6],[1,4,7],[2,5,8],
-                [0,4,8],[2,4,6]
-            ];
-            for (let line of lines) {
-                const [a,b,c] = line;
-                if (board[a] && board[a] === board[b] && board[a] === board[c]) {
-                    return board[a];
-                }
-            }
-            if (board.every(cell => cell !== null)) return 'draw';
-            return null;
-        }
-
-        function onCanvasClick(e) {
-            if (winner) return;
-            const rect = canvas.getBoundingClientRect();
-            const scaleX = canvas.width / rect.width;
-            const scaleY = canvas.height / rect.height;
-            const mx = (e.clientX - rect.left) * scaleX;
-            const my = (e.clientY - rect.top) * scaleY;
-            const cellSize = W/3;
-            const col = Math.floor(mx / cellSize);
-            const row = Math.floor(my / cellSize);
-            const idx = row*3 + col;
-            if (board[idx]) return;
-            board[idx] = turn;
-            const w = checkWinner();
-            if (w) {
-                if (w === 'X') scoreX++;
-                else if (w === 'O') scoreO++;
-                winner = w;
-            } else {
-                turn = (turn === 'X') ? 'O' : 'X';
-            }
-        }
-        canvas.addEventListener('click', onCanvasClick);
-
-        function reset() {
-            board.fill(null);
-            turn = 'X';
-            winner = null;
-        }
-
-        function draw() {
-            ctx.fillStyle='#f0f2f5'; ctx.fillRect(0,0,W,H);
-            const cellSize = W/3;
-            ctx.strokeStyle='#b2bec3'; ctx.lineWidth=3;
-            for (let i=1; i<3; i++) {
-                ctx.beginPath(); ctx.moveTo(i*cellSize, 0); ctx.lineTo(i*cellSize, H); ctx.stroke();
-                ctx.beginPath(); ctx.moveTo(0, i*cellSize); ctx.lineTo(W, i*cellSize); ctx.stroke();
-            }
-            ctx.font='52px sans-serif';
-            ctx.textAlign='center';
-            ctx.textBaseline='middle';
-            for (let i=0; i<9; i++) {
-                const row = Math.floor(i/3);
-                const col = i%3;
-                const x = col*cellSize + cellSize/2;
-                const y = row*cellSize + cellSize/2;
-                ctx.fillStyle = board[i] === 'X' ? '#0984e3' : '#e17055';
-                ctx.fillText(board[i] || '', x, y);
-            }
-            ctx.fillStyle='#2d3436';
-            ctx.font='18px sans-serif';
-            ctx.textAlign='left';
-            ctx.textBaseline='top';
-            ctx.fillText('❌X: '+scoreX+'  ⭕O: '+scoreO, 14, 14);
-            if (winner) {
-                ctx.fillStyle='#d63031';
-                ctx.font='24px sans-serif';
-                ctx.textAlign='center';
-                ctx.textBaseline='bottom';
-                ctx.fillText(winner === 'draw' ? 'Ничья!' : 'Победил '+winner+'!', W/2, H-10);
-                setTimeout(() => { reset(); }, 1500);
-            }
-        }
-
-        function loop() {
-            if (!gameRunning) return;
-            draw();
-            animId = requestAnimationFrame(loop);
-        }
-        function cleanup() { canvas.removeEventListener('click', onCanvasClick); }
-        loop();
-        return { cleanup };
-    }
-
-    // ================================================================
-    //  ИГРА 12: GUESS NUMBER (угадай число)
-    // ================================================================
-    function gameGuess() {
-        let target = Math.floor(Math.random()*100)+1;
-        let attempts = 0;
-        let message = 'Введите число от 1 до 100';
-        let input = '';
-        let gameOver = false;
-
-        function onKey(e) {
-            if (gameOver) return;
-            if (e.key === 'Enter') {
-                const num = parseInt(input);
-                if (isNaN(num) || num<1 || num>100) {
-                    message = '❌ Введите число от 1 до 100';
-                } else {
-                    attempts++;
-                    if (num === target) {
-                        message = '🎉 Поздравляю! Угадал за '+attempts+' попыток!';
-                        gameOver = true;
-                    } else if (num < target) {
-                        message = '⬆️ Больше (попытка '+attempts+')';
-                    } else {
-                        message = '⬇️ Меньше (попытка '+attempts+')';
-                    }
-                }
-                input = '';
-                return;
-            }
-            if (e.key === 'Backspace') {
-                input = input.slice(0, -1);
-            } else if (e.key >= '0' && e.key <= '9' && input.length < 3) {
-                input += e.key;
-            }
-        }
-        window.addEventListener('keydown', onKey);
-
-        function resetGame() {
-            target = Math.floor(Math.random()*100)+1;
-            attempts = 0;
-            message = 'Новое число! Угадай';
             input = '';
-            gameOver = false;
+            return;
         }
+        if (e.key === 'Backspace') input = input.slice(0,-1);
+        else if (e.key >= '0' && e.key <= '9' && input.length < 3) input += e.key;
+    }
+    window.addEventListener('keydown', onKey);
 
-        function draw() {
-            ctx.fillStyle='#f0f2f5'; ctx.fillRect(0,0,W,H);
-            ctx.fillStyle='#2d3436';
-            ctx.font='28px sans-serif';
-            ctx.textAlign='center';
-            ctx.textBaseline='middle';
-            ctx.fillText('🔢 Угадай число', W/2, 80);
-            ctx.font='20px sans-serif';
-            ctx.fillText(message, W/2, 150);
-            ctx.font='36px sans-serif';
-            ctx.fillStyle='#0984e3';
-            ctx.fillText(input || '_', W/2, 240);
-            ctx.fillStyle='#636e72';
-            ctx.font='16px sans-serif';
-            ctx.fillText('Нажми Enter для проверки', W/2, 310);
-            if (gameOver) {
-                ctx.fillStyle='#00b894';
-                ctx.font='18px sans-serif';
-                ctx.fillText('🔄 Нажмите "Закрыть" и откройте игру заново', W/2, 380);
-            }
-        }
-
-        function loop() {
-            if (!gameRunning) return;
-            draw();
-            animId = requestAnimationFrame(loop);
-        }
-        function cleanup() {
-            window.removeEventListener('keydown', onKey);
-        }
-        loop();
-        return { cleanup };
+    function draw() {
+        ctx.fillStyle='#fff'; ctx.fillRect(0,0,W,H);
+        ctx.fillStyle='#212529'; ctx.textAlign='center'; ctx.textBaseline='middle';
+        ctx.font='24px sans-serif'; ctx.fillText('🔢 Угадай число', W/2, 60);
+        ctx.font='18px sans-serif'; ctx.fillText(msg, W/2, 120);
+        ctx.font='32px sans-serif'; ctx.fillStyle='#0d6efd'; ctx.fillText(input || '_', W/2, 200);
+        ctx.font='14px sans-serif'; ctx.fillStyle='#6c757d'; ctx.fillText('Enter → проверить', W/2, 270);
     }
 
-    // ================================================================
-    //  РЕЕСТР ИГР
-    // ================================================================
-    const games = {
-        invaders: gameInvaders,
-        pacman: gamePacman,
-        dkong: gameDkong,
-        asteroids: gameAsteroids,
-        breakout: gameBreakout,
-        pole: gamePole,
-        snake: gameSnake,
-        dragon: gameDragon,
-        tetris: gameTetris,
-        memory: gameMemory,
-        tictac: gameTictac,
-        guess: gameGuess,
-    };
+    function loop() { if (!running) return; draw(); animId = requestAnimationFrame(loop); }
+    loop();
+    return { cleanup: ()=>{ window.removeEventListener('keydown', onKey); } };
+}
 
-    // ================================================================
-    //  ЗАПУСК ПО КЛИКУ
-    // ================================================================
-    document.querySelectorAll('.play-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            const card = e.target.closest('.game-card');
-            const gameName = card.dataset.game;
-            startGame(gameName);
+// ----- MEMORY -----
+function gameMemory() {
+    const emojis = ['🍎','🍌','🍒','🍇','🍉','🍓','🍑','🍊'];
+    let cards = [];
+    let flipped = [], matched = [], locked = false, score = 0;
+
+    function shuffle(arr) { for (let i=arr.length-1; i>0; i--) { const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; } return arr; }
+    function init() {
+        const deck = shuffle([...emojis, ...emojis]);
+        cards = deck.map((e,i)=>({id:i, emoji:e, flipped:false, matched:false}));
+        flipped=[]; matched=[]; locked=false; score=0;
+    }
+    init();
+
+    function onClick(e) {
+        if (locked) return;
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        const mx = (e.clientX - rect.left)*scaleX;
+        const my = (e.clientY - rect.top)*scaleY;
+        const cols=8, rows=2;
+        const cw = W/cols, ch = H/rows;
+        const col = Math.floor(mx/cw), row = Math.floor(my/ch);
+        const idx = row*cols + col;
+        if (idx >= cards.length) return;
+        const card = cards[idx];
+        if (card.flipped || card.matched) return;
+        card.flipped = true;
+        flipped.push(card);
+        if (flipped.length === 2) {
+            locked = true;
+            if (flipped[0].emoji === flipped[1].emoji) {
+                flipped[0].matched = true; flipped[1].matched = true;
+                score += 10;
+                flipped = [];
+                locked = false;
+                if (cards.every(c=>c.matched)) setTimeout(()=>{ alert('🏆 Победа! '+score); }, 100);
+            } else {
+                setTimeout(()=>{ flipped[0].flipped=false; flipped[1].flipped=false; flipped=[]; locked=false; }, 500);
+            }
+        }
+    }
+    canvas.addEventListener('click', onClick);
+
+    function draw() {
+        ctx.fillStyle='#fff'; ctx.fillRect(0,0,W,H);
+        const cols=8, rows=2, cw=W/cols, ch=H/rows;
+        for (let i=0; i<cards.length; i++) {
+            const r=Math.floor(i/cols), c=i%cols;
+            const x=c*cw, y=r*ch;
+            const card = cards[i];
+            ctx.fillStyle = card.matched ? '#dee2e6' : (card.flipped ? '#e9ecef' : '#0d6efd');
+            ctx.fillRect(x+4, y+4, cw-8, ch-8);
+            if (card.flipped || card.matched) {
+                ctx.fillStyle='#212529'; ctx.font='28px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+                ctx.fillText(card.emoji, x+cw/2, y+ch/2);
+            }
+        }
+        ctx.fillStyle='#212529'; ctx.font='14px sans-serif'; ctx.textAlign='left'; ctx.textBaseline='top';
+        ctx.fillText('🃏 '+score, 8,8);
+    }
+
+    function loop() { if (!running) return; draw(); animId = requestAnimationFrame(loop); }
+    loop();
+    return { cleanup: ()=>{ canvas.removeEventListener('click', onClick); } };
+}
+
+// ----- INVADERS (упрощённый) -----
+function gameInvaders() {
+    let player = { x: W/2, y: H-40, w: 34, h: 18 };
+    let bullets = [];
+    let enemies = [];
+    let score = 0, lives = 3, dir = 1, speed = 1.2, frame = 0;
+
+    function initEnemies() {
+        enemies = [];
+        for (let r=0; r<3; r++) for (let c=0; c<7; c++)
+            enemies.push({ x: 50+c*60, y: 20+r*32, w: 28, h: 22, alive: true });
+    }
+    initEnemies();
+
+    function onMouse(e) {
+        const rect = canvas.getBoundingClientRect();
+        const scale = canvas.width / rect.width;
+        player.x = (e.clientX - rect.left)*scale;
+        player.x = Math.max(17, Math.min(W-17, player.x));
+    }
+    canvas.addEventListener('mousemove', onMouse);
+
+    function onKey(e) {
+        if (e.key === ' ' || e.key === 'Space') {
+            e.preventDefault();
+            if (bullets.length < 5) bullets.push({ x: player.x, y: player.y-14, w:3, h:10 });
+        }
+    }
+    window.addEventListener('keydown', onKey);
+
+    function update() {
+        frame++;
+        bullets.forEach(b => b.y -= 4);
+        bullets = bullets.filter(b => b.y > 0);
+
+        let edge = false;
+        enemies.forEach(e => {
+            if (!e.alive) return;
+            e.x += speed * dir;
+            if (e.x < 10 || e.x > W-38) edge = true;
         });
-    });
+        if (edge) { dir *= -1; enemies.forEach(e => e.y += 6); speed += 0.05; }
 
-    closeBtn.addEventListener('click', () => {
-        stopCurrent();
-        container.classList.remove('active');
-        grid.style.display = 'grid';
-        statusEl.textContent = '🎮 Игра закрыта';
-    });
+        bullets.forEach(b => {
+            enemies.forEach(e => {
+                if (!e.alive) return;
+                if (b.x > e.x && b.x < e.x+e.w && b.y > e.y && b.y < e.y+e.h) {
+                    e.alive = false; score += 10; b.dead = true;
+                }
+            });
+        });
+        bullets = bullets.filter(b => !b.dead);
 
-    statusEl.textContent = '🎮 Выберите игру';
+        if (frame % 30 === 0) {
+            const alive = enemies.filter(e => e.alive && !e.isBullet);
+            if (alive.length) {
+                const e = alive[Math.floor(Math.random()*alive.length)];
+                enemies.push({ x: e.x+10, y: e.y+24, w:6, h:10, alive:true, isBullet:true });
+            }
+        }
+        enemies.forEach(e => { if (e.isBullet) e.y += 2.5; });
+        enemies = enemies.filter(e => !(e.isBullet && e.y > H));
+
+        enemies.forEach(e => {
+            if (!e.isBullet) return;
+            if (e.x > player.x-14 && e.x < player.x+14 && e.y > player.y-14 && e.y < player.y+14) {
+                e.alive = false; lives--;
+                if (lives <= 0) running = false;
+            }
+        });
+
+        if (enemies.filter(e => e.alive && !e.isBullet).length === 0) {
+            score += 50; initEnemies(); speed = 1.2;
+        }
+    }
+
+    function draw() {
+        ctx.fillStyle='#fff'; ctx.fillRect(0,0,W,H);
+        ctx.fillStyle='#0d6efd';
+        ctx.fillRect(player.x-17, player.y-9, 34, 18);
+        ctx.fillStyle='#6ea8fe';
+        ctx.fillRect(player.x-10, player.y-16, 20, 8);
+
+        ctx.fillStyle='#dc3545';
+        bullets.forEach(b => ctx.fillRect(b.x-1.5, b.y-5, 3, 10));
+
+        enemies.forEach(e => {
+            if (!e.alive) return;
+            if (e.isBullet) {
+                ctx.fillStyle='#dc3545';
+                ctx.fillRect(e.x-3, e.y-5, 6, 10);
+            } else {
+                ctx.fillStyle='#28a745';
+                ctx.fillRect(e.x, e.y, e.w, e.h);
+                ctx.fillStyle='#8fdf8f';
+                ctx.fillRect(e.x+6, e.y-4, 6, 4);
+                ctx.fillRect(e.x+16, e.y-4, 6, 4);
+            }
+        });
+
+        ctx.fillStyle='#212529'; ctx.font='14px sans-serif';
+        ctx.fillText('👾 '+score, 8,20);
+        ctx.fillText('❤️ '.repeat(lives), W-70,20);
+        if (lives <= 0) { ctx.fillStyle='#dc3545'; ctx.font='24px sans-serif'; ctx.fillText('GAME OVER', W/2-70, H/2); }
+    }
+
+    function loop() { if (!running) return; update(); draw(); animId = requestAnimationFrame(loop); }
+    loop();
+    return { cleanup: ()=>{ canvas.removeEventListener('mousemove', onMouse); window.removeEventListener('keydown', onKey); } };
+}
+
+// ============================================================
+//  РЕЕСТР
+// ============================================================
+const games = {
+    snake: gameSnake,
+    breakout: gameBreakout,
+    tictac: gameTictac,
+    guess: gameGuess,
+    memory: gameMemory,
+    invaders: gameInvaders,
+};
 </script>
 </body>
 </html>
